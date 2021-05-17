@@ -21,7 +21,7 @@ class AuthController extends Controller
      */
     public function login(Request $request){
         $validator = Validator::make($request->all(), [
-            'phone' => 'required',
+            'phone' => 'required|phone_number',
             'password' => 'required|string',
         ]);
 
@@ -31,12 +31,12 @@ class AuthController extends Controller
 
         $code = rand(1000,9999);
 
-//        $sms = new Sms([$request->phone], $code);
-//        $response = $sms->send();
-//
-//        if (!$response['success']){
-//            return  response()->json($response);
-//        }
+        $sms = new Sms([$request->phone], $code);
+        $response = $sms->send();
+
+        if (!$response['success']){
+            return  response()->json($response);
+        }
 
         SmsCode::create([
             'code' => $code,
