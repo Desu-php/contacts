@@ -6,7 +6,7 @@ use App\Models\Person;
 use App\Models\Personlink;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class PersonlinkFactory extends Factory
+class PersonLinkFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
