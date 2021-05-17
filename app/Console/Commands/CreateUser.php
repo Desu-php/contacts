@@ -48,6 +48,18 @@ class CreateUser extends Command
                 'password' => Hash::make('Passw0rd')
             ]
         );
+
+        User::updateOrCreate(
+            [
+                'name' => 'softJet',
+                'phone' => '79097139938',
+            ],
+            [
+                'password' => Hash::make('Passw0rd')
+            ]
+        );
+
+
         return 0;
     }
 }
