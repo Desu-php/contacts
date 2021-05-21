@@ -5,18 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class File extends Model
+class PersonInfo extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'path',
-        'type',
-        'size',
+        'name'
     ];
 
     public function persons()
     {
-        return $this->belongsToMany(Person::class, 'person_files');
+        return $this->belongsToMany(Person::class, 'person_info_values')->withPivot('value');
     }
+
 }

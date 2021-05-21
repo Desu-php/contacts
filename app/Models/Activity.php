@@ -12,4 +12,9 @@ class Activity extends Model
     protected $fillable = [
         'name'
     ];
+
+    public function person()
+    {
+        return $this->belongsToMany(Person::class,'person_activities');
+    }
 }

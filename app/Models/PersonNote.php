@@ -13,6 +13,8 @@ class PersonNote extends Model
 
     protected $fillable = [
         'person_id',
+        'address',
+        'text',
         'note',
         'type',
         'protected',

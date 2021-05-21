@@ -5,18 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class File extends Model
+class ContactType extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'path',
-        'type',
-        'size',
+        'name',
+        'image'
     ];
 
-    public function persons()
+    public function contacts()
     {
-        return $this->belongsToMany(Person::class, 'person_files');
+        return $this->hasMany(PersonContact::class);
     }
 }

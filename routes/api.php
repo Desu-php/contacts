@@ -34,5 +34,25 @@ Route::group([
 });
 
 Route::group(['middleware' => ['jwt.verify'],], function (){
-    Route::get('persons', 'Api\PersonController@index');
+    Route::get('get_list_persons ', 'Api\PersonController@get_list_persons');
+
+    Route::get('get_list_towns', 'Api\CityController@get_list_towns');
+    Route::get('get_list_city', 'Api\CityController@get_list_city');
+
+    Route::get('get_list_activity', 'Api\ActivityController@get_list_activity');
+    Route::get('get_list_activities', 'Api\ActivityController@get_list_activities');
+
+    Route::get('get_list_company', 'Api\CompanyController@get_list_company');
+
+    Route::get('get_list_info', 'Api\InfoController@get_list_info');
+
+
+    Route::get('get_list_multiple_id', 'Api\ContactController@get_list_multiple_id');
+    Route::get('get_list_contacts', 'Api\ContactController@get_list_contacts');
+
+    Route::get('get_list_note ', 'Api\NoteController@get_list_note');
+
+    Route::get('get_list_image ', 'Api\ImageController@get_list_image');
+
+    Route::get('get_list_tags ', 'Api\TagController@get_list_tags');
 });

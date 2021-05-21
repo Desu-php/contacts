@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 class PersonController extends Controller
 {
     //
-    public function index(Request $request)
+    public function get_list_persons(Request $request)
     {
         $persons = Person::where('user_id', Auth::id())
             ->with([
@@ -21,8 +21,10 @@ class PersonController extends Controller
                 'companies',
                 'links',
                 'files',
-                'activities'
-            ])->get();
+                'activities',
+                'contacts',
+                'infos'
+            ])->paginate();
 
         return response()->json($persons);
     }

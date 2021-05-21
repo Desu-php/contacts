@@ -32,6 +32,8 @@ class PersonNoteFactory extends Factory
             'protected' => $this->faker->boolean,
             'lat' => $this->faker->latitude,
             'lon' => $this->faker->longitude,
+            'address' => $this->faker->address,
+            'pin' => $this->faker->numberBetween(0,1)
         ];
     }
 }

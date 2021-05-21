@@ -15,4 +15,9 @@ class City extends Model
         'lat',
         'lon'
     ];
+
+    public function persons()
+    {
+        return $this->belongsToMany(Person::class, 'person_cities');
+    }
 }

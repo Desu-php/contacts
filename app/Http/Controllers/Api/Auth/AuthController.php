@@ -26,17 +26,17 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            return response()->json($validator->errors(), 400);
         }
 
         $code = rand(1000,9999);
-
-        $sms = new Sms([$request->phone], $code);
-        $response = $sms->send();
-
-        if (!$response['success']){
-            return  response()->json($response);
-        }
+//
+//        $sms = new Sms([$request->phone], $code);
+//        $response = $sms->send();
+//
+//        if (!$response['success']){
+//            return  response()->json($response);
+//        }
 
         SmsCode::create([
             'code' => $code,

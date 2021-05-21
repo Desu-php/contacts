@@ -12,4 +12,9 @@ class Company extends Model
     protected $fillable = [
         'name'
     ];
+
+    public function persons()
+    {
+        return $this->belongsToMany(Person::class, 'person_companies')->withPivot('position');
+    }
 }

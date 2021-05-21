@@ -65,4 +65,14 @@ class Person extends Model
     {
         return $this->belongsToMany(Company::class, 'person_connection', 'who_whorm', 'who');
     }
+
+    public function contacts()
+    {
+        return $this->hasMany(PersonContact::class);
+    }
+
+    public function infos()
+    {
+        return $this->belongsToMany(PersonInfo::class, 'person_info_values')->withPivot('value');
+    }
 }
