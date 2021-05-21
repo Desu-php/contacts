@@ -59,15 +59,6 @@ class CreateUser extends Command
             ]
         );
 
-        User::updateOrCreate(
-            [
-                'name' => 'mobile',
-                'phone' => '79097139938',
-            ],
-            [
-                'password' => Hash::make('Passw0rd')
-            ]
-        );
 
         User::updateOrCreate(
             [
