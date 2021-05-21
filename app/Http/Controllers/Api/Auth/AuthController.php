@@ -19,7 +19,8 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function login(Request $request){
+    public function login(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'phone' => 'required|phone_number',
             'password' => 'required|string',
@@ -29,14 +30,16 @@ class AuthController extends Controller
             return response()->json($validator->errors(), 400);
         }
 
-        $code = rand(1000,9999);
-//
-//        $sms = new Sms([$request->phone], $code);
-//        $response = $sms->send();
-//
-//        if (!$response['success']){
-//            return  response()->json($response);
-//        }
+        $code = rand(1000, 9999);
+
+        if (env('APP_ENV') == 'production') {
+            $sms = new Sms([$request->phone], $code);
+            $response = $sms->send();
+
+            if (!$response['success']) {
+                return response()->json($response);
+            }
+        }
 
         SmsCode::create([
             'code' => $code,
@@ -54,14 +57,14 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'phone' => 'required|phone_number',
             'password' => 'required|string',
-            'code' => 'required|code:'.$request->phone.'|code_try:'.$request->phone,
+            'code' => 'required|code:' . $request->phone . '|code_try:' . $request->phone,
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 401);
         }
 
-        if (! $token = auth('api')->attempt($request->only('phone', 'password'))) {
+        if (!$token = auth('api')->attempt($request->only('phone', 'password'))) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -73,13 +76,14 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function register(Request $request) {
+    public function register(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'phone' => 'required|phone_number',
             'password' => 'required|string|confirmed|min:6',
         ]);
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return response()->json($validator->errors()->toJson(), 400);
         }
 
@@ -100,7 +104,8 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function logout() {
+    public function logout()
+    {
         auth()->logout();
 
         return response()->json(['message' => 'User successfully signed out']);
@@ -111,7 +116,8 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function refresh() {
+    public function refresh()
+    {
         return $this->createNewToken(auth()->refresh());
     }
 
@@ -120,18 +126,20 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function userProfile() {
+    public function userProfile()
+    {
         return response()->json(auth()->user());
     }
 
     /**
      * Get the token array structure.
      *
-     * @param  string $token
+     * @param string $token
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function createNewToken($token){
+    protected function createNewToken($token)
+    {
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
