@@ -30,15 +30,17 @@ class AuthController extends Controller
             return response()->json($validator->errors(), 400);
         }
 
-        $code = rand(1000, 9999);
 
         if (env('APP_ENV') == 'production') {
+            $code = rand(1000, 9999);
             $sms = new Sms([$request->phone], $code);
             $response = $sms->send();
 
             if (!$response['success']) {
                 return response()->json($response);
             }
+        }else{
+            $code = 1234;
         }
 
         SmsCode::create([
