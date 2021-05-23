@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Auth;
 
+use App\Helpers\Phone;
 use App\Http\Controllers\Controller;
 use App\Models\SmsCode;
 use App\Models\User;
@@ -45,7 +46,7 @@ class AuthController extends Controller
 
         SmsCode::create([
             'code' => $code,
-            'phone' => $request->phone,
+            'phone' => Phone::formatCorrected($request->phone),
             'try' => 0
         ]);
 
@@ -59,7 +60,7 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'phone' => 'required|phone_number',
             'password' => 'required|string',
-            'code' => 'required|code:' . $request->phone . '|code_try:' . $request->phone,
+            'code' => 'required|code:' . Phone::formatCorrected($request->phone) . '|code_try:' . Phone::formatCorrected($request->phone) ,
         ]);
 
         if ($validator->fails()) {
@@ -67,7 +68,7 @@ class AuthController extends Controller
         }
 
         $attempt = $request->only('phone', 'password');
-        $attempt['phone'] = str_replace('+', '', $attempt['phone']);
+        $attempt['phone'] = Phone::formatCorrected($attempt['phone']);
 
         if (!$token = auth('api')->attempt($attempt)) {
             return response()->json(['error' => 'Unauthorized'], 401);
@@ -152,4 +153,5 @@ class AuthController extends Controller
             'user' => auth()->user()
         ]);
     }
+
 }
