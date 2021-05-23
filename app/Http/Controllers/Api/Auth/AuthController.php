@@ -66,7 +66,10 @@ class AuthController extends Controller
             return response()->json($validator->errors(), 401);
         }
 
-        if (!$token = auth('api')->attempt($request->only('phone', 'password'))) {
+        $attempt = $request->only('phone', 'password');
+        $attempt['phone'] = str_replace('+', '', $attempt['phone']);
+
+        if (!$token = auth('api')->attempt($attempt)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
