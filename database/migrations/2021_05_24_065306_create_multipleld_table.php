@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePersonPhonesTable extends Migration
+class CreateMultipleldTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,10 @@ class CreatePersonPhonesTable extends Migration
      */
     public function up()
     {
-        Schema::create('person_phones', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('person_id')->constrained('persons')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('phone');
+        Schema::create('multipleld', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('person_id')->constrained('persons')->cascadeOnDelete()->cascadeOnDelete();
+            $table->string('identifier', 50);
             $table->timestamps();
         });
     }
@@ -28,6 +28,6 @@ class CreatePersonPhonesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('person_phones');
+        Schema::dropIfExists('multipleld');
     }
 }

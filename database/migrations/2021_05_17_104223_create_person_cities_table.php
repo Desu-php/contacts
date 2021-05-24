@@ -14,9 +14,9 @@ class CreatePersonCitiesTable extends Migration
     public function up()
     {
         Schema::create('person_cities', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('person_id')->constrained('persons')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('city_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->uuid('id')->primary();
+            $table->foreignUuid('person_id')->constrained('persons')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignUuid('city_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
 
         });
     }

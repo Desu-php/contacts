@@ -14,8 +14,8 @@ class CreatePersonLinksTable extends Migration
     public function up()
     {
         Schema::create('person_links', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('person_id')->constrained('persons')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->uuid('id')->primary();
+            $table->foreignUuid('person_id')->constrained('persons')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');
             $table->string('link');
             $table->timestamps();

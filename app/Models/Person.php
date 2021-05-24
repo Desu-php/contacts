@@ -2,28 +2,29 @@
 
 namespace App\Models;
 
+use App\Traits\Uuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Person extends Model
 {
     protected $table = 'persons';
-    use HasFactory;
+    use HasFactory,Uuids;
 
     protected $fillable = [
-        'name',
-        'type',
+        'givenName',
+        'familyName',
+        'middleName',
+        'moreNo',
+        'reminderCall',
+        'removed',
+        'thumbnailImage',
         'user_id'
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function phones()
-    {
-        return $this->hasMany(PersonPhone::class);
     }
 
     public function links()
@@ -43,7 +44,7 @@ class Person extends Model
 
     public function tags()
     {
-        return $this->hasMany(PersonTag::class);
+        return $this->belongsToMany(Tag::class, 'person_tags');
     }
 
     public function cities()
@@ -58,12 +59,12 @@ class Person extends Model
 
     public function companies()
     {
-        return $this->belongsToMany(Company::class, 'person_companies')->withPivot('position');
+        return $this->belongsToMany(Company::class, 'person_companies');
     }
 
     public function connections()
     {
-        return $this->belongsToMany(Company::class, 'person_connection', 'who_whorm', 'who');
+        return $this->belongsToMany(Company::class, 'person_connections', 'with_whom', 'who', 'id', 'id');
     }
 
     public function contacts()
@@ -74,5 +75,10 @@ class Person extends Model
     public function infos()
     {
         return $this->belongsToMany(PersonInfo::class, 'person_info_values')->withPivot('value');
+    }
+
+    public function multiplelds()
+    {
+        return $this->hasMany(Multipleld::class);
     }
 }

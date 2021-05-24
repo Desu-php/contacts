@@ -27,7 +27,6 @@ class PersonCompanyFactory extends Factory
             //
             'person_id' => Person::all()->random(),
             'company_id' => Company::all()->random(),
-            'position' => $this->faker->firstName
         ];
     }
 }

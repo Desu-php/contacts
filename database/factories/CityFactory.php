@@ -25,7 +25,6 @@ class CityFactory extends Factory
         return [
             //
             'name' => $this->faker->city,
-            'slug' => Str::slug($this->faker->city),
             'lat' => $this->faker->latitude,
             'lon' => $this->faker->longitude
         ];

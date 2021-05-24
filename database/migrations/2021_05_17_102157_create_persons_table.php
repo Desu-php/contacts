@@ -14,10 +14,15 @@ class CreatePersonsTable extends Migration
     public function up()
     {
         Schema::create('persons', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('name', 50);
-            $table->string('type', 50);
+            $table->uuid('id')->primary();
+            $table->foreignUuid('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->string('givenName', 50);
+            $table->string('familyName', 50)->nullable();
+            $table->string('middleName', 50)->nullable();
+            $table->boolean('moreNo')->default(0);
+            $table->bigInteger('reminderCall')->nullable();
+            $table->boolean('removed')->default(0);
+            $table->string('thumbnailImage')->nullable();
             $table->timestamps();
         });
     }

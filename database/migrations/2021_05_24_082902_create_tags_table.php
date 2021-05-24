@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePersonTagsTable extends Migration
+class CreateTagsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,9 @@ class CreatePersonTagsTable extends Migration
      */
     public function up()
     {
-        Schema::create('person_tags', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('person_id')->constrained('persons')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('tag');
+        Schema::create('tags', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->string('name');
             $table->timestamps();
         });
     }
@@ -28,6 +27,6 @@ class CreatePersonTagsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('person_tags');
+        Schema::dropIfExists('tags');
     }
 }

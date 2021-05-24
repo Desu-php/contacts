@@ -39,7 +39,7 @@ class AppServiceProvider extends ServiceProvider
                 return true;
             }
             return false;
-        }, 'Введите правильный номер телефона');
+        }, 'Неверный формат номера телефона');
 
         Validator::extend('code', function ($attribute, $value, $parameters) {
             if (!empty($parameters)) {
@@ -59,7 +59,7 @@ class AppServiceProvider extends ServiceProvider
                 }
             }
             return false;
-        }, 'Не правильно ввели код подверждения');
+        }, 'Неправильно ввели код подтверждения');
 
         Validator::extend('code_try', function ($attribute, $value, $parameters) {
             if (!empty($parameters)) {

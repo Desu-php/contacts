@@ -19,6 +19,7 @@ use App\Models\PersonLink;
 use App\Models\PersonNote;
 use App\Models\PersonPhone;
 use App\Models\PersonTag;
+use App\Models\Tag;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -32,11 +33,11 @@ class DatabaseSeeder extends Seeder
     {
         // \App\Models\User::factory(10)->create();
         Person::factory(20)->create();
-        PersonPhone::factory(50)->create();
         PersonLink::factory(50)->create();
         File::factory(50)->create();
         PersonNote::factory(50)->create();
         PersonFile::factory(50)->create();
+        Tag::factory(50)->create();
         PersonTag::factory(50)->create();
         City::factory(50)->create();
         PersonCity::factory(50)->create();

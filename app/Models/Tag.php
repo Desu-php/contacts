@@ -6,13 +6,12 @@ use App\Traits\Uuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PersonCity extends Model
+class Tag extends Model
 {
     use HasFactory,Uuids;
 
     protected $fillable = [
-        'city_id',
-        'person_id'
+        'name'
     ];
-    public $timestamps = false;
+
 }

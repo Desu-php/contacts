@@ -6,13 +6,9 @@ use App\Traits\Uuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PersonCity extends Model
+class Multipleld extends Model
 {
     use HasFactory,Uuids;
 
-    protected $fillable = [
-        'city_id',
-        'person_id'
-    ];
-    public $timestamps = false;
+    protected $table = 'multipleld';
 }

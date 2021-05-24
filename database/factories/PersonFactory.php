@@ -25,8 +25,13 @@ class PersonFactory extends Factory
         return [
             //
             'user_id' => User::all()->random(),
-            'name' => $this->faker->name,
-            'type' => $this->faker->name,
+            'givenName' => $this->faker->firstName,
+            'familyName' => $this->faker->lastName,
+            'middleName' => $this->faker->firstName,
+            'moreNo' => $this->faker->boolean,
+            'reminderCall' => $this->faker->numberBetween(1, 10000000),
+            'removed' => $this->faker->boolean,
+            'thumbnailImage' => $this->faker->imageUrl()
         ];
     }
 }

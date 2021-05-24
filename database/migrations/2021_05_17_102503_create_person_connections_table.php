@@ -14,9 +14,9 @@ class CreatePersonConnectionsTable extends Migration
     public function up()
     {
         Schema::create('person_connections', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('with_whom')->constrained('persons')->cascadeOnDelete()->cascadeOnUpdate();
-            $table->foreignId('who')->constrained('persons')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->uuid('id')->primary();
+            $table->foreignUuid('with_whom')->constrained('persons')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignUuid('who')->constrained('persons')->cascadeOnDelete()->cascadeOnUpdate();
         });
     }
 

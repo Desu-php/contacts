@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Person;
 use App\Models\PersonTag;
+use App\Models\Tag;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class PersonTagFactory extends Factory
@@ -25,7 +26,7 @@ class PersonTagFactory extends Factory
         return [
             //
             'person_id' => Person::all()->random(),
-            'tag' => $this->faker->name,
+            'tag_id' => Tag::all()->random(),
         ];
     }
 }

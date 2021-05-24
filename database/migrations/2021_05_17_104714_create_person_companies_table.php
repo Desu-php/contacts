@@ -14,10 +14,9 @@ class CreatePersonCompaniesTable extends Migration
     public function up()
     {
         Schema::create('person_companies', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('person_id')->constrained('persons')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('company_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('position');
+            $table->uuid('id')->primary();
+            $table->foreignUuid('person_id')->constrained('persons')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignUuid('company_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
         });
     }

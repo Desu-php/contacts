@@ -14,9 +14,9 @@ class CreatePersonContactsTable extends Migration
     public function up()
     {
         Schema::create('person_contacts', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('person_id')->constrained('persons')->cascadeOnDelete()->cascadeOnUpdate();
-            $table->foreignId('contact_type_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->uuid('id')->primary();
+            $table->foreignUuid('person_id')->constrained('persons')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignUuid('contact_type_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->string('value');
             $table->timestamps();
         });

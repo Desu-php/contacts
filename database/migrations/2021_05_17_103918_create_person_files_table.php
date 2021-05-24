@@ -14,9 +14,9 @@ class CreatePersonFilesTable extends Migration
     public function up()
     {
         Schema::create('person_files', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('person_id')->constrained('persons')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('file_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->uuid('id')->primary();
+            $table->foreignUuid('person_id')->constrained('persons')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignUuid('file_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('type');
             $table->timestamps();
         });

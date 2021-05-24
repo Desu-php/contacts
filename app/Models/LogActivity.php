@@ -5,17 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Action extends Model
+class LogActivity extends Model
 {
     use HasFactory;
 
     protected $fillable = [
+        'app_id',
+        'index',
         'action',
-        'user_id'
+        'entity',
+        'values'
     ];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
 }

@@ -35,6 +35,7 @@ Route::group([
 
 Route::group(['middleware' => ['jwt.verify'],], function (){
     Route::get('get_list_persons ', 'Api\PersonController@get_list_persons');
+    Route::post('person/upload ', 'Api\PersonController@uploadImage');
 
     Route::get('get_list_towns', 'Api\CityController@get_list_towns');
     Route::get('get_list_city', 'Api\CityController@get_list_city');
@@ -52,7 +53,10 @@ Route::group(['middleware' => ['jwt.verify'],], function (){
 
     Route::get('get_list_note ', 'Api\NoteController@get_list_note');
 
-    Route::get('get_list_image ', 'Api\ImageController@get_list_image');
+    Route::get('get_list_image ', 'Api\FileController@get_list_image');
+
 
     Route::get('get_list_tags ', 'Api\TagController@get_list_tags');
+
+    Route::post('put_log_change_param', 'Api\LogActivityController@put_log_change_param');
 });

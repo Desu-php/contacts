@@ -41,7 +41,6 @@ class CreateUser extends Command
     {
         User::updateOrCreate(
             [
-                'name' => 'jabor',
                 'phone' => '89998825337',
             ],
             [
@@ -51,7 +50,6 @@ class CreateUser extends Command
 
         User::updateOrCreate(
             [
-                'name' => 'softJet',
                 'phone' => '79097139938',
             ],
             [
@@ -62,7 +60,6 @@ class CreateUser extends Command
 
         User::updateOrCreate(
             [
-                'name' => 'mobile',
                 'phone' => '79659703070',
             ],
             [

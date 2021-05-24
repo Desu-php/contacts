@@ -2,18 +2,17 @@
 
 namespace Database\Factories;
 
-use App\Models\Person;
-use App\Models\PersonPhone;
+use App\Models\Tag;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class PersonPhoneFactory extends Factory
+class TagFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = PersonPhone::class;
+    protected $model = Tag::class;
 
     /**
      * Define the model's default state.
@@ -24,8 +23,7 @@ class PersonPhoneFactory extends Factory
     {
         return [
             //
-            'phone' => $this->faker->phoneNumber,
-            'person_id' => Person::all()->random()
+            'name' => $this->faker->name
         ];
     }
 }

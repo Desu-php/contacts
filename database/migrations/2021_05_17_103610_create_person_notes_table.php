@@ -14,14 +14,17 @@ class CreatePersonNotesTable extends Migration
     public function up()
     {
         Schema::create('person_notes', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('person_id')->constrained('persons')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('file_id')->nullable()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('note');
+            $table->uuid('id')->primary();
+            $table->foreignUuid('person_id')->constrained('persons')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignUuid('file_id')->nullable()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->text('note');
             $table->string('type')->nullable();
             $table->boolean('protected')->default(0);
             $table->decimal('lat', 20,11)->nullable();
             $table->decimal('lon', 20,11)->nullable();
+            $table->boolean('pin')->default(0);
+            $table->string('address')->nullable();
+            $table->text('text')->nullable();
             $table->timestamps();
         });
     }

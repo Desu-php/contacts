@@ -14,9 +14,9 @@ class CreatePersonInfoValuesTable extends Migration
     public function up()
     {
         Schema::create('person_info_values', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('person_info_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('person_id')->constrained('persons')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->uuid('id')->primary();
+            $table->foreignUuid('person_info_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignUuid('person_id')->constrained('persons')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('value');
             $table->timestamps();
         });
