@@ -48,7 +48,14 @@ class LogActivityController extends Controller
                 $result = $this->update($request);
                 break;
             default:
+                $result = ['success' => false, 'message' => 'Action не найден'];
                 return true;
+        }
+
+        if (!$result['success']){
+            return  response()->json([
+                'error' => $result['message']
+            ],500);
         }
 
         return response()->json(true);
