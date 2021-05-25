@@ -59,13 +59,13 @@ class LogActivityController extends Controller
             ], 500);
         }
 
+        $this->logCreate($request);
         return response()->json(true);
     }
 
     private function add($request)
     {
         try {
-            $this->logCreate($request);
             $insert = [];
 
             foreach ($request->changes['values'] as $key => $value) {
@@ -85,8 +85,6 @@ class LogActivityController extends Controller
     private function del($request)
     {
         try {
-            $this->logCreate($request);
-
             $model = $this->createModel($request->changes['entity']);
 
             $where = [];
@@ -108,8 +106,6 @@ class LogActivityController extends Controller
     private function set($request)
     {
         try {
-            $this->logCreate($request);
-
             $model = $model = $this->createModel($request->changes['entity']);
 
             $where = [];
@@ -133,8 +129,6 @@ class LogActivityController extends Controller
     private function update($request)
     {
         try {
-            $this->logCreate($request);
-
             $model = $model = $this->createModel($request->changes['entity']);
 
             $where = [];
