@@ -161,7 +161,8 @@ class LogActivityController extends Controller
             'action' => $request->changes['action'],
             'entity' => $request->changes['entity'],
             'values' => json_encode($request->changes['values']),
-            'user_id' => Auth::id()
+            'user_id' => Auth::id(),
+            'where' => $request->changes['where'],
         ]);
     }
 

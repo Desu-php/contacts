@@ -21,6 +21,7 @@ class CreateLogActivitiesTable extends Migration
             $table->string('action');
             $table->string('entity');
             $table->json('values');
+            $table->json('where')->nullable();
             $table->timestamps();
         });
     }
