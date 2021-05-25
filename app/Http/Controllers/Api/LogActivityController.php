@@ -191,7 +191,7 @@ class LogActivityController extends Controller
         }
 
         $logActivities = LogActivity::where('app_id', '<>', $request->AppId)
-            ->where('id', '<', $request->ID)
+            ->where('id', '>', $request->ID)
             ->where('user_id', Auth::id())->get();
 
         return response()->json([
