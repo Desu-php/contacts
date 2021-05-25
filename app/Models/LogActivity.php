@@ -14,6 +14,7 @@ class LogActivity extends Model
         'index',
         'action',
         'entity',
-        'values'
+        'values',
+        'user_id'
     ];
 }

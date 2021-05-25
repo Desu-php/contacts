@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\LogActivity;
 use App\Models\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -52,10 +53,10 @@ class LogActivityController extends Controller
                 return true;
         }
 
-        if (!$result['success']){
-            return  response()->json([
+        if (!$result['success']) {
+            return response()->json([
                 'error' => $result['message']
-            ],500);
+            ], 500);
         }
 
         return response()->json(true);
@@ -165,7 +166,8 @@ class LogActivityController extends Controller
             'index' => $request->changes['index'],
             'action' => $request->changes['action'],
             'entity' => $request->changes['entity'],
-            'values' => json_encode($request->changes['values'])
+            'values' => json_encode($request->changes['values']),
+            'user_id' => Auth::id()
         ]);
     }
 
@@ -182,14 +184,15 @@ class LogActivityController extends Controller
             'ID' => 'required|numeric',
         ]);
 
-        if ($validator->fails()){
+        if ($validator->fails()) {
             return response()->json([
                 'errors' => $validator->getMessageBag()
             ], 400);
         }
 
-       $logActivities = LogActivity::where('app_id', '<>', $request->AppId)
-            ->where('id','<', $request->ID)->get();
+        $logActivities = LogActivity::where('app_id', '<>', $request->AppId)
+            ->where('id', '<', $request->ID)
+            ->where('user_id', Auth::id())->get();
 
         return response()->json([
             'data' => $logActivities

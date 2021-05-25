@@ -15,6 +15,7 @@ class CreateLogActivitiesTable extends Migration
     {
         Schema::create('log_activities', function (Blueprint $table) {
             $table->id();
+            $table->foreignUuid('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->uuid('app_id');
             $table->bigInteger('index');
             $table->string('action');
