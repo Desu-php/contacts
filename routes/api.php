@@ -59,4 +59,5 @@ Route::group(['middleware' => ['jwt.verify'],], function (){
     Route::get('get_list_tags ', 'Api\TagController@get_list_tags');
 
     Route::post('put_log_change_param', 'Api\LogActivityController@put_log_change_param');
+    Route::get('get_log_change_param', 'Api\LogActivityController@get_log_change_param');
 });

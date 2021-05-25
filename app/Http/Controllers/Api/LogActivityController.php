@@ -135,7 +135,7 @@ class LogActivityController extends Controller
             }
 
             $values = [];
-            foreach ($request->changes['values'] as $key => $value){
+            foreach ($request->changes['values'] as $key => $value) {
                 $values[$key] = $value;
             }
 
@@ -166,5 +166,27 @@ class LogActivityController extends Controller
     {
         $entity = 'App\Models\\' . ucfirst($entity);
         return new $entity;
+    }
+
+    public function get_log_change_param(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'AppID' => 'required|string',
+            'ID' => 'required|numeric',
+        ]);
+
+        if ($validator->fails()){
+            return response()->json([
+                'errors' => $validator->getMessageBag()
+            ], 400);
+        }
+
+       $logActivities = LogActivity::where('app_id', '<>', $request->AppId)
+            ->where('id','<', $request->ID)->get();
+
+        return response()->json([
+            'data' => $logActivities
+        ]);
+
     }
 }
