@@ -26,7 +26,9 @@ class PersonController extends Controller
                 'infos',
                 'connections',
                 'multiplelds'
-            ])->paginate();
+            ])
+            ->where('me', 0)
+            ->paginate();
 
         return response()->json($persons);
     }
@@ -38,13 +40,13 @@ class PersonController extends Controller
             'person_id' => 'required|exists:persons,id'
         ]);
 
-        if ($validator->fails()){
+        if ($validator->fails()) {
             return response()->json([
                 'errors' => $validator->getMessageBag()
             ], 400);
         }
 
-        $filePath = 'storage/'.$request->file('image')->store('/uploads/thumbnailImages','public');
+        $filePath = $this->uploadFile($request->file('image'), 'thumbnailImages');
 
         Person::where('id', $request->person_id)
             ->update([
@@ -52,5 +54,66 @@ class PersonController extends Controller
             ]);
 
         return response()->json($filePath);
+    }
+
+    public function get_user_info()
+    {
+        $persons = Person::where('user_id', Auth::id())
+            ->where('me', 1)
+            ->with([
+                'tags',
+                'cities',
+                'companies',
+                'activities',
+                'contacts',
+                'infos',
+                'profileInfo'
+            ])->first();
+
+        return response()->json($persons);
+    }
+
+    public function change_user_info(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'givenName' => 'nullable|string',
+            'familyName' => 'nullable|string',
+            'middleName' => 'nullable|string',
+            'moreNo' => 'nullable|boolean',
+            'reminderCall' => 'nullable|numeric',
+            'removed' => 'nullable|boolean',
+            'thumbnailImage' => 'nullable|file|mimes:png,jpeg,jpg,webp,gif',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->getMessageBag(),
+            ], 400);
+        }
+
+        $person = Person::where('user_id', Auth::id())
+            ->where('me', 1)
+            ->first();
+
+        $person->givenName = $request->givenName;
+        $person->familyName = $request->familyName;
+        $person->middleName = $request->middleName;
+        $person->moreNo = $request->moreNo;
+        $person->reminderCall = $request->reminderCall;
+        $person->removed = $request->removed;
+
+        if ($request->hasFile('thumbnailImage')) {
+            $person->thumbnailImage = $this->uploadFile($request->file('thumbnailImage'), 'thumbnailImages');
+        }
+        $person->save();
+
+        return response()->json([
+            'message' => 'Успешно обновлен'
+        ]);
+    }
+
+    private function uploadFile($file, $dir = '')
+    {
+        return $filePath = 'storage/' . $file->store('/uploads/' . $dir, 'public');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Person;
 use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
@@ -39,7 +40,7 @@ class CreateUser extends Command
      */
     public function handle()
     {
-        User::updateOrCreate(
+        $user = User::updateOrCreate(
             [
                 'phone' => '89998825337',
             ],
@@ -48,7 +49,12 @@ class CreateUser extends Command
             ]
         );
 
-        User::updateOrCreate(
+        Person::updateOrCreate([
+            'user_id' => $user->id,
+            'me' => 1
+        ]);
+
+        $user = User::updateOrCreate(
             [
                 'phone' => '79097139938',
             ],
@@ -57,8 +63,13 @@ class CreateUser extends Command
             ]
         );
 
+        Person::updateOrCreate([
+            'user_id' => $user->id,
+            'me' => 1
+        ]);
 
-        User::updateOrCreate(
+
+        $user = User::updateOrCreate(
             [
                 'phone' => '79659703070',
             ],
@@ -66,6 +77,11 @@ class CreateUser extends Command
                 'password' => Hash::make('Passw0rd')
             ]
         );
+
+        Person::updateOrCreate([
+            'user_id' => $user->id,
+            'me' => 1
+        ]);
 
 
         return 0;

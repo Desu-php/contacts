@@ -20,6 +20,7 @@ use App\Models\PersonNote;
 use App\Models\PersonPhone;
 use App\Models\PersonTag;
 use App\Models\Tag;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -49,6 +50,5 @@ class DatabaseSeeder extends Seeder
         PersonContact::factory(50)->create();
         PersonInfo::factory(50)->create();
         PersonInfoValue::factory(50)->create();
-
     }
 }

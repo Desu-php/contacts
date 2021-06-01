@@ -6,11 +6,11 @@ use App\Traits\Uuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Tymon\JWTAuth\Contracts\JWTSubject;
+use Laravel\Passport\HasApiTokens;
 
-class User extends Authenticatable implements JWTSubject
+class User extends Authenticatable
 {
-    use HasFactory, Notifiable, Uuids;
+    use HasFactory, Notifiable, Uuids, HasApiTokens;
 
     /**
      * The attributes that are mass assignable.
@@ -30,6 +30,7 @@ class User extends Authenticatable implements JWTSubject
     protected $hidden = [
         'password',
         'remember_token',
+        'phone_verified_at',
     ];
 
     /**
@@ -42,21 +43,14 @@ class User extends Authenticatable implements JWTSubject
         'phone_verified_at' => 'datetime'
     ];
 
-    /**
-     * Get the identifier that will be stored in the subject claim of the JWT.
-     *
-     * @return mixed
-     */
-    public function getJWTIdentifier() {
-        return $this->getKey();
+
+    public function findForPassport($username) {
+
+        return $this->where('phone', $username)->first();
     }
 
-    /**
-     * Return a key value array, containing any custom claims to be added to the JWT.
-     *
-     * @return array
-     */
-    public function getJWTCustomClaims() {
-        return [];
+    public function profile()
+    {
+        return $this->hasOne(Person::class)->where('me', 1);
     }
 }

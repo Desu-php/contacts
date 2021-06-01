@@ -19,7 +19,8 @@ class Person extends Model
         'reminderCall',
         'removed',
         'thumbnailImage',
-        'user_id'
+        'user_id',
+        'me'
     ];
 
     public function user()
@@ -80,5 +81,10 @@ class Person extends Model
     public function multiplelds()
     {
         return $this->hasMany(Multipleld::class);
+    }
+
+    public function profileInfo()
+    {
+        return $this->hasOne(ProfileInfo::class);
     }
 }

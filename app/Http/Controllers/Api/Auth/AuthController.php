@@ -8,8 +8,9 @@ use App\Models\SmsCode;
 use App\Models\User;
 use App\Services\Sms;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Http;
 
 class AuthController extends Controller
 {
@@ -31,6 +32,9 @@ class AuthController extends Controller
             return response()->json($validator->errors(), 400);
         }
 
+        if (!$this->authCheck($request)) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
 
         if (env('APP_ENV') == 'production') {
             $code = rand(1000, 9999);
@@ -40,7 +44,7 @@ class AuthController extends Controller
             if (!$response['success']) {
                 return response()->json($response);
             }
-        }else{
+        } else {
             $code = 1234;
         }
 
@@ -60,21 +64,43 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'phone' => 'required|phone_number',
             'password' => 'required|string',
-            'code' => 'required|code:' . Phone::formatCorrected($request->phone) . '|code_try:' . Phone::formatCorrected($request->phone) ,
+            'code' => 'required|code:' . Phone::formatCorrected($request->phone) . '|code_try:' . Phone::formatCorrected($request->phone),
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 401);
         }
 
-        $attempt = $request->only('phone', 'password');
-        $attempt['phone'] = Phone::formatCorrected($attempt['phone']);
-
-        if (!$token = auth('api')->attempt($attempt)) {
+        if (!$this->authCheck($request)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        return $this->createNewToken($token);
+        return $this->getTokenAndRefreshToken($request->input('phone'), $request->input('password'));
+    }
+
+    private function getTokenAndRefreshToken($phone, $password)
+    {
+        $response = Http::asForm()->post(config('app.url').'/oauth/token', [
+            'grant_type' => 'password',
+            'client_id' => config('passport.OAUTH_PWD_GRANT_CLIENT_ID'),
+            'client_secret' => config('passport.OAUTH_PWD_GRANT_CLIENT_SECRET'),
+            'username' => $phone,
+            'password' => $password,
+            'scope' => ''
+        ]);
+
+        return $response->json();
+    }
+
+    private function authCheck($request)
+    {
+        $attempt = $request->only('phone', 'password');
+        $attempt['phone'] = Phone::formatCorrected($attempt['phone']);
+
+        if (!Auth::attempt($attempt)) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -122,9 +148,22 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function refresh()
+    public function refresh(Request $request)
     {
-        return $this->createNewToken(auth()->refresh());
+        return $this->refreshToken($request->refresh_token);
+    }
+
+    private function refreshToken($refresh_token)
+    {
+        $response = Http::asForm()->post(config('app.url').'/oauth/token', [
+            'grant_type' => 'refresh_token',
+            'refresh_token' => $refresh_token,
+            'client_id' => config('passport.OAUTH_PWD_GRANT_CLIENT_ID'),
+            'client_secret' => config('passport.OAUTH_PWD_GRANT_CLIENT_SECRET'),
+            'scope' => '',
+        ]);
+
+        return $response->json();
     }
 
     /**
@@ -144,12 +183,11 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function createNewToken($token)
+    protected function createNewToken($access_token, $refresh_token)
     {
         return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth('api')->factory()->getTTL() * 60,
+            'access_token' => $access_token,
+            'refresh_token' => $refresh_token,
         ]);
     }
 
