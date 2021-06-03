@@ -128,7 +128,7 @@ class SharingController extends Controller
                 'sharing_id' => $sharing->id
             ]);
 
-            if ($sharingUser->access == 0) {
+            if ($sharingUser->access == SharingUser::ACCESS_DENIED) {
                 return response()->json([
                     'message' => 'Доступ к списку запрещен'
                 ], 403);
@@ -173,7 +173,7 @@ class SharingController extends Controller
         }
 
         $sharingUser = SharingUser::where('sharing_id', $request->sharing_id)
-            ->where('access', 1)
+            ->where('access', SharingUser::ACCESS_ALLOWED)
             ->whereHas('sharing', function (Builder $builder) {
                 $builder->where('user_id', Auth::id());
             });
@@ -182,7 +182,7 @@ class SharingController extends Controller
             $sharingUser->where('user_id', $request->user_id);
         }
 
-        $sharingUser->update(['access' => 0]);
+        $sharingUser->update(['access' => SharingUser::ACCESS_DENIED]);
 
         return response()->json([
             'message' => 'Доступ успешно закрыть'
@@ -224,7 +224,7 @@ class SharingController extends Controller
         return response()->json([
             Sharing::whereHas('users', function (Builder $builder) {
                 $builder->where('users.id', Auth::id())
-                    ->where('access', 1);
+                    ->where('access', SharingUser::ACCESS_ALLOWED);
             })->get()
         ]);
     }
@@ -241,7 +241,11 @@ class SharingController extends Controller
             ], 404);
         }
 
-        return response()->json($sharing->users()->where('access', 1)->with('profile.profileInfo')->get());
+        return response()->json($sharing
+            ->users()
+            ->where('access', SharingUser::ACCESS_ALLOWED)
+            ->with('profile.profileInfo')
+            ->get());
     }
 
     public function search(Request $request)
@@ -259,7 +263,7 @@ class SharingController extends Controller
 
         $sharings = Sharing::whereHas('users', function (Builder $builder) {
             $builder->where('users.id', Auth::id())
-                ->where('access', 1);
+                ->where('access', SharingUser::ACCESS_ALLOWED);
         })->where(function (Builder $builder) use ($query) {
             $builder->where('name', 'LIKE', '%' . $query . '%')
                 ->orWhereHas('tags', function (Builder $builder) use ($query) {
@@ -274,17 +278,48 @@ class SharingController extends Controller
                 ->orWhereHas('companies', function (Builder $builder) use ($query) {
                     $builder->where('name', 'LIKE', '%' . $query . '%');
                 });
-        })
-            ->with([
-                'tags',
-                'activities',
+        })->where(function (Builder  $builder) use ($query){
+            $builder->orWhereHas('user.persons.tags', function (Builder $builder) use ($query) {
+                $builder->where('name', 'LIKE', '%' . $query . '%');
+            })
+                ->orWhereHas('user.persons.cities', function (Builder $builder) use ($query) {
+                    $builder->where('name', 'LIKE', '%' . $query . '%');
+                })
+                ->orWhereHas('user.persons.activities', function (Builder $builder) use ($query) {
+                    $builder->where('name', 'LIKE', '%' . $query . '%');
+                })
+                ->orWhereHas('user.persons.companies', function (Builder $builder) use ($query) {
+                    $builder->where('name', 'LIKE', '%' . $query . '%');
+                });
+        })->with(['user.persons' => function($builder) use($query){
+            $builder->where(function (Builder $builder) use($query){
+                $builder->orWhereHas('tags', function (Builder $builder) use ($query) {
+                    $builder->where('name', 'LIKE', '%' . $query . '%');
+                })
+                    ->orWhereHas('cities', function (Builder $builder) use ($query) {
+                        $builder->where('name', 'LIKE', '%' . $query . '%');
+                    })
+                    ->orWhereHas('activities', function (Builder $builder) use ($query) {
+                        $builder->where('name', 'LIKE', '%' . $query . '%');
+                    })
+                    ->orWhereHas('companies', function (Builder $builder) use ($query) {
+                        $builder->where('name', 'LIKE', '%' . $query . '%');
+                    });
+            });
+            $builder->with( [
                 'companies',
-                'cities'
-            ])->get();
+                'activities',
+                'cities',
+                'tags'
+            ]);
+        }])->get();
+
 
         $results = $sharings->map(function ($sharing) {
-            if ($sharing->type_access == 0) {
-                unset($sharing->activities);
+            if ($sharing->type_access == SharingUser::ACCESS_DENIED) {
+                 $sharing->user->persons->map(function ($item){
+                     unset($item->activities);
+                });
             }
             return $sharing;
         });

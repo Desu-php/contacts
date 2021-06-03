@@ -53,4 +53,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(Person::class)->where('me', 1);
     }
+
+    public function persons()
+    {
+        return $this->hasMany(Person::class);
+    }
 }

@@ -10,6 +10,9 @@ class SharingUser extends Model
 {
     use HasFactory, Uuids;
 
+    const ACCESS_ALLOWED = 1;
+    const ACCESS_DENIED = 0;
+
     protected $fillable = [
         'sharing_id',
         'user_id',
