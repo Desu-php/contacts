@@ -72,6 +72,10 @@ class LogActivityController extends Controller
                 $insert[$key] = $value;
             }
 
+            if(ucfirst($request->changes['entity']) == 'Person'){
+                $insert['user_id'] = Auth::id();
+            }
+
             $model = $this->createModel($request->changes['entity']);
 
             $model->create($insert);
