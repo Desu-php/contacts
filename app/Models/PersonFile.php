@@ -12,7 +12,8 @@ class PersonFile extends Model
     protected $fillable = [
         'person_id',
         'file_id',
-        'type'
+        'type',
+        'id'
     ];
 
 

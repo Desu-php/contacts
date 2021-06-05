@@ -12,7 +12,8 @@ class PersonActivity extends Model
 
     protected $fillable = [
         'person_id',
-        'activity_id'
+        'activity_id',
+        'id'
     ];
 
     public $timestamps = false;

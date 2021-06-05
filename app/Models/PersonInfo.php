@@ -11,7 +11,8 @@ class PersonInfo extends Model
     use HasFactory,Uuids;
 
     protected $fillable = [
-        'name'
+        'name',
+        'id'
     ];
 
     public function persons()

@@ -13,6 +13,7 @@ class PersonInfoValue extends Model
     protected $fillable = [
         'person_id',
         'person_info_id',
-        'value'
+        'value',
+        'id'
     ];
 }

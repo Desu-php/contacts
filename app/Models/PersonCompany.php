@@ -13,6 +13,7 @@ class PersonCompany extends Model
     protected $fillable = [
         'person_id',
         'company_id',
+        'id'
     ];
 
     public $timestamps = false;

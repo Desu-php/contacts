@@ -13,7 +13,8 @@ class City extends Model
     protected $fillable = [
         'name',
         'lat',
-        'lon'
+        'lon',
+        'id'
     ];
 
     public function persons()

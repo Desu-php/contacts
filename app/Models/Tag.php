@@ -11,7 +11,8 @@ class Tag extends Model
     use HasFactory,Uuids;
 
     protected $fillable = [
-        'name'
+        'name',
+        'id'
     ];
 
 }

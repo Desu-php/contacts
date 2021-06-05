@@ -15,7 +15,8 @@ class PersonLink extends Model
     protected $fillable = [
         'person_id',
         'link',
-        'name'
+        'name',
+        'id'
     ];
 
     public function person()

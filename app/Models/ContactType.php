@@ -12,7 +12,8 @@ class ContactType extends Model
 
     protected $fillable = [
         'name',
-        'image'
+        'image',
+        'id'
     ];
 
     public function contacts()

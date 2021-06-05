@@ -21,7 +21,8 @@ class PersonNote extends Model
         'protected',
         'lat',
         'lon',
-        'file_id'
+        'file_id',
+        'id'
     ];
 
     public function file()

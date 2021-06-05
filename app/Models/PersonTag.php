@@ -12,7 +12,8 @@ class PersonTag extends Model
 
     protected $fillable = [
         'person_id',
-        'tag_id'
+        'tag_id',
+        'id'
     ];
 
     public function person()

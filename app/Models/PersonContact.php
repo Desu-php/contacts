@@ -13,6 +13,7 @@ class PersonContact extends Model
     protected $fillable = [
         'contact_type_id',
         'value',
+        'id'
     ];
 
     public function person()

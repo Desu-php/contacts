@@ -14,6 +14,7 @@ class File extends Model
         'path',
         'type',
         'size',
+        'id'
     ];
 
     public function persons()

@@ -20,7 +20,8 @@ class Person extends Model
         'removed',
         'thumbnailImage',
         'user_id',
-        'me'
+        'me',
+        'id'
     ];
 
     public function user()

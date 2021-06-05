@@ -16,7 +16,8 @@ class SharingUser extends Model
     protected $fillable = [
         'sharing_id',
         'user_id',
-        'access'
+        'access',
+        'id'
     ];
 
     public function user()

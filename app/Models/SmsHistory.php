@@ -11,6 +11,7 @@ class SmsHistory extends Model
 
     protected $fillable = [
         'phone',
-        'sms_id'
+        'sms_id',
+        'id'
     ];
 }

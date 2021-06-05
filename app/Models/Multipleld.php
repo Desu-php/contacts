@@ -12,5 +12,5 @@ class Multipleld extends Model
 
     protected $table = 'multipleld';
 
-    protected $fillable = ['person_id', 'identifier'];
+    protected $fillable = ['person_id', 'identifier', 'id'];
 }

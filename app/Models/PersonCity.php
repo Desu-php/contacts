@@ -12,7 +12,8 @@ class PersonCity extends Model
 
     protected $fillable = [
         'city_id',
-        'person_id'
+        'person_id',
+        'id'
     ];
     public $timestamps = false;
 }

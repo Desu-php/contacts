@@ -15,6 +15,7 @@ class Sharing extends Model
         'name',
         'type_access',
         'open',
+        'id'
     ];
 
     public function user()

@@ -16,6 +16,7 @@ class LogActivity extends Model
         'entity',
         'values',
         'user_id',
-        'where'
+        'where',
+        'id'
     ];
 }
