@@ -18,7 +18,7 @@ Route::post('auth/checkCode', 'Auth\AuthController@checkCode')->name('web.checkC
 
 Route::get('sharing/{sharing_id}', 'SharingController@show')
     ->name('web.sharing.show')
-    ->middleware(['auth', 'verified']);
+    ->middleware('authInvite');
 //Route::get('/', function () {
 //    return Inertia::render('Welcome', [
 //        'canLogin' => Route::has('login'),
@@ -28,8 +28,8 @@ Route::get('sharing/{sharing_id}', 'SharingController@show')
 //    ]);
 //});
 //
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
-require __DIR__.'/auth.php';
+
+Auth::routes(['register' => false]);
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

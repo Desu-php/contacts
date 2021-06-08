@@ -80,7 +80,7 @@ class AuthController extends Controller
 
     private function getTokenAndRefreshToken($phone, $password)
     {
-        $response = Http::asForm()->post(config('app.url').'/oauth/token', [
+        $response = Http::asForm()->post(config('app.url') . '/oauth/token', [
             'grant_type' => 'password',
             'client_id' => config('passport.OAUTH_PWD_GRANT_CLIENT_ID'),
             'client_secret' => config('passport.OAUTH_PWD_GRANT_CLIENT_SECRET'),
@@ -155,7 +155,7 @@ class AuthController extends Controller
 
     private function refreshToken($refresh_token)
     {
-        $response = Http::asForm()->post(config('app.url').'/oauth/token', [
+        $response = Http::asForm()->post(config('app.url') . '/oauth/token', [
             'grant_type' => 'refresh_token',
             'refresh_token' => $refresh_token,
             'client_id' => config('passport.OAUTH_PWD_GRANT_CLIENT_ID'),

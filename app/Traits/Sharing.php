@@ -16,7 +16,7 @@ trait Sharing
         $sharing = \App\Models\Sharing::where('id', $id)
             ->where('open', ModelSharing::OPEN)
             ->first();
-        dd($sharing);
+
         if (is_null($sharing)) {
             if ($request->expectsJson()){
                 return response()->json([
@@ -33,9 +33,13 @@ trait Sharing
             $sharingUser = SharingUser::firstOrCreate([
                 'user_id' => Auth::id(),
                 'sharing_id' => $sharing->id
-            ]);
+            ],
+                [
+                    'access'  => 1
+                ]
+            );
 
-            if ($sharingUser->access == SharingUser::ACCESS_DENIED) {
+            if ($sharingUser->access === SharingUser::ACCESS_DENIED) {
                 if ($request->expectsJson()){
                     return response()->json([
                         'message' => 'Доступ к списку запрещен'
@@ -43,10 +47,9 @@ trait Sharing
                 }else{
                     abort(403);
                 }
-
             }
-
         }
+
         if ($request->expectsJson()){
             return response()->json([
                 'message' => 'Доступ к списку получен'

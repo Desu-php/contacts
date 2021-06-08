@@ -18,14 +18,15 @@ class LogActivityController extends Controller
     public function put_log_change_param(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'appId' => 'required|string',
-            'changes' => 'required|array',
-            'changes.index' => 'required|numeric',
-            'changes.action' => 'required|string',
-            'changes.entity' => 'required|string',
-            'changes.id' => 'nullable|numeric',
-            'changes.values' => 'required|array',
-            'changes.where' => 'nullable|array'
+            'logs' => 'required|array',
+            'logs.appId' => 'required|string',
+            'logs.changes' => 'required|array',
+            'logs.changes.index' => 'required|numeric',
+            'logs.changes.action' => 'required|string',
+            'logs.changes.entity' => 'required|string',
+            'logs.changes.id' => 'nullable|numeric',
+            'logs.changes.values' => 'required|array',
+            'logs.changes.where' => 'nullable|array'
         ]);
 
         if ($validator->fails()) {
@@ -34,30 +35,33 @@ class LogActivityController extends Controller
             ], 400);
         }
 
-        $result = [];
-        switch ($request->changes['action']) {
-            case 'add':
-                $result = $this->add($request);
-                break;
-            case 'del':
-                $result = $this->del($request);
-                break;
-            case 'set':
-                $result = $this->set($request);
-                break;
-            case 'update':
-                $result = $this->update($request);
-                break;
-            default:
-                $result = ['success' => false, 'message' => 'Action не найден'];
-                return true;
+        foreach ($request->logs as $log){
+            $result = [];
+            switch ($log['changes']['action']) {
+                case 'add':
+                    $result = $this->add($log);
+                    break;
+                case 'del':
+                    $result = $this->del($log);
+                    break;
+                case 'set':
+                    $result = $this->set($log);
+                    break;
+                case 'update':
+                    $result = $this->update($log);
+                    break;
+                default:
+                    $result = ['success' => false, 'message' => 'Action не найден'];
+                    return true;
+            }
+
+            if (!$result['success']) {
+                return response()->json([
+                    'error' => $result['message']
+                ], 500);
+            }
         }
 
-        if (!$result['success']) {
-            return response()->json([
-                'error' => $result['message']
-            ], 500);
-        }
 
         $this->logCreate($request);
         return response()->json(true);
