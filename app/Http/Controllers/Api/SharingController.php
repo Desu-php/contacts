@@ -10,9 +10,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
+
 class SharingController extends Controller
 {
     //
+    use \App\Traits\Sharing;
     public function store(Request $request)
     {
         $validator = $this->validations($request);
@@ -34,7 +36,8 @@ class SharingController extends Controller
 
         return response()->json([
             'id' => $sharing->id,
-            'url' => route('sharing.show', $sharing->id)
+            'api' => route('sharing.show', $sharing->id),
+            'web' => route('web.sharing.show', $sharing->id)
         ]);
 
     }
@@ -88,7 +91,8 @@ class SharingController extends Controller
 
         return response()->json([
             'id' => $sharing->id,
-            'url' => route('sharing.show', $sharing->id)
+            'api' => route('sharing.show', $sharing->id),
+            'web' => route('web.sharing.show', $sharing->id)
         ]);
 
     }
@@ -111,35 +115,7 @@ class SharingController extends Controller
         ]);
     }
 
-    public function show($id)
-    {
-        $sharing = Sharing::find($id);
 
-        if (is_null($sharing)) {
-            return response()->json([
-                'error' => 'sharing not found'
-            ], 404);
-        }
-
-        if ($sharing->user_id != Auth::id()) {
-
-            $sharingUser = SharingUser::firstOrCreate([
-                'user_id' => Auth::id(),
-                'sharing_id' => $sharing->id
-            ]);
-
-            if ($sharingUser->access == SharingUser::ACCESS_DENIED) {
-                return response()->json([
-                    'message' => 'Доступ к списку запрещен'
-                ], 403);
-            }
-
-        }
-
-        return response()->json([
-            'message' => 'Доступ к списку получен'
-        ]);
-    }
 
     public function destroy($id)
     {

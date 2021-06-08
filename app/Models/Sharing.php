@@ -10,6 +10,9 @@ class Sharing extends Model
 {
     use HasFactory, Uuids;
 
+    const OPEN = 1;
+    const CLOSE = 0;
+
     protected $fillable = [
         'user_id',
         'name',
