@@ -19,14 +19,14 @@ class LogActivityController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'logs' => 'required|array',
-            'logs.appId' => 'required|string',
-            'logs.changes' => 'required|array',
-            'logs.changes.index' => 'required|numeric',
-            'logs.changes.action' => 'required|string',
-            'logs.changes.entity' => 'required|string',
-            'logs.changes.id' => 'nullable|numeric',
-            'logs.changes.values' => 'required|array',
-            'logs.changes.where' => 'nullable|array'
+            'logs.*.appId' => 'required|string',
+            'logs.*.changes' => 'required|array',
+            'logs.*.changes.index' => 'required|numeric',
+            'logs.*.changes.action' => 'required|string',
+            'logs.*.changes.entity' => 'required|string',
+            'logs.*.changes.id' => 'nullable|numeric',
+            'logs.*.changes.values' => 'required|array',
+            'logs.*.changes.where' => 'nullable|array'
         ]);
 
         if ($validator->fails()) {
@@ -35,7 +35,7 @@ class LogActivityController extends Controller
             ], 400);
         }
 
-        foreach ($request->logs as $log){
+        foreach ($request->logs as $log){;
             $result = [];
             switch ($log['changes']['action']) {
                 case 'add':
@@ -60,27 +60,26 @@ class LogActivityController extends Controller
                     'error' => $result['message']
                 ], 500);
             }
+            $this->logCreate($log);
         }
 
-
-        $this->logCreate($request);
         return response()->json(true);
     }
 
-    private function add($request)
+    private function add($log)
     {
         try {
             $insert = [];
 
-            foreach ($request->changes['values'] as $key => $value) {
+            foreach ($log['changes']['values'] as $key => $value) {
                 $insert[$key] = $value;
             }
 
-            if(ucfirst($request->changes['entity']) == 'Person'){
+            if(ucfirst($log['changes']['entity']) == 'Person'){
                 $insert['user_id'] = Auth::id();
             }
 
-            $model = $this->createModel($request->changes['entity']);
+            $model = $this->createModel($log['changes']['entity']);
 
             $model->create($insert);
 
@@ -90,14 +89,14 @@ class LogActivityController extends Controller
         }
     }
 
-    private function del($request)
+    private function del($log)
     {
         try {
-            $model = $this->createModel($request->changes['entity']);
+            $model = $this->createModel($log['changes']['entity']);
 
             $where = [];
 
-            foreach ($request->changes['values'] as $key => $value) {
+            foreach ($log['changes']['values'] as $key => $value) {
                 $where[] = [$key, $value];
             }
 
@@ -111,14 +110,14 @@ class LogActivityController extends Controller
         }
     }
 
-    private function set($request)
+    private function set($log)
     {
         try {
-            $model = $model = $this->createModel($request->changes['entity']);
+            $model = $model = $this->createModel($log['changes']['entity']);
 
             $where = [];
 
-            foreach ($request->changes['values'] as $key => $value) {
+            foreach ($log['changes']['values'] as $key => $value) {
                 $where[$key] = $value;
             }
 
@@ -134,18 +133,18 @@ class LogActivityController extends Controller
 
     }
 
-    private function update($request)
+    private function update($log)
     {
         try {
-            $model = $model = $this->createModel($request->changes['entity']);
+            $model = $model = $this->createModel($log['changes']['entity']);
 
             $where = [];
-            foreach ($request->changes['where'] as $key => $value) {
+            foreach ($log['changes']['where'] as $key => $value) {
                 $where[] = [$key, $value];
             }
 
             $values = [];
-            foreach ($request->changes['values'] as $key => $value) {
+            foreach ($log['changes']['values'] as $key => $value) {
                 $values[$key] = $value;
             }
 
@@ -161,16 +160,16 @@ class LogActivityController extends Controller
 
     }
 
-    private function logCreate($request)
+    private function logCreate($log)
     {
         LogActivity::create([
-            'app_id' => $request->appId,
-            'index' => $request->changes['index'],
-            'action' => $request->changes['action'],
-            'entity' => $request->changes['entity'],
-            'values' => json_encode($request->changes['values']),
+            'app_id' => $log['appId'],
+            'index' => $log['changes']['index'],
+            'action' => $log['changes']['action'],
+            'entity' => $log['changes']['entity'],
+            'values' => json_encode($log['changes']['values']),
             'user_id' => Auth::id(),
-            'where' => json_encode($request->changes['where']),
+            'where' => json_encode($log['changes']['where']),
         ]);
     }
 
