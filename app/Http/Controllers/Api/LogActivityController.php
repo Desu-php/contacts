@@ -35,7 +35,8 @@ class LogActivityController extends Controller
             ], 400);
         }
 
-        foreach ($request->logs as $log){;
+        foreach ($request->logs as $log) {
+            ;
             $result = [];
             switch ($log['changes']['action']) {
                 case 'add':
@@ -75,7 +76,7 @@ class LogActivityController extends Controller
                 $insert[$key] = $value;
             }
 
-            if(ucfirst($log['changes']['entity']) == 'Person'){
+            if (ucfirst($log['changes']['entity']) == 'Person') {
                 $insert['user_id'] = Auth::id();
             }
 
@@ -184,6 +185,7 @@ class LogActivityController extends Controller
         $validator = Validator::make($request->all(), [
             'AppID' => 'required|string',
             'ID' => 'required|numeric',
+            'limit' => 'nullable|numeric'
         ]);
 
         if ($validator->fails()) {
@@ -194,10 +196,14 @@ class LogActivityController extends Controller
 
         $logActivities = LogActivity::where('app_id', '<>', $request->AppId)
             ->where('id', '>', $request->ID)
-            ->where('user_id', Auth::id())->get();
+            ->where('user_id', Auth::id());
+
+        if (!empty($request->limit)) {
+            $logActivities->take($request->limit);
+        }
 
         return response()->json([
-            'data' => $logActivities
+            'data' => $logActivities->get()
         ]);
 
     }
