@@ -76,7 +76,7 @@ class Person extends Model
 
     public function infos()
     {
-        return $this->belongsToMany(PersonInfo::class, 'person_info_values')->withPivot('value');
+        return $this->belongsToMany(PersonInfo::class, 'person_info_values')->withPivot(['value', 'id']);
     }
 
     public function multiplelds()
