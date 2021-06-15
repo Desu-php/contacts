@@ -31,10 +31,10 @@ class PersonController extends Controller
             ->where('me', 0)
             ->paginate();
 
-        $persons->last_id = LogActivity::where('user_id', Auth::id())
-            ->orderBy('id', 'DESC')->first()->id;
+        $log = LogActivity::where('user_id', Auth::id())
+            ->orderBy('id', 'DESC')->first();
 
-        return response()->json($persons);
+        return response()->json(['data' => $persons, 'last_id' => !is_null($log)?$log->id:null]);
     }
 
     public function uploadImage(Request $request)
