@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\LogActivity;
 use App\Models\Person;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,6 +30,9 @@ class PersonController extends Controller
             ])
             ->where('me', 0)
             ->paginate();
+
+        $persons->last_id = LogActivity::where('user_id', Auth::id())
+            ->orderBy('id', 'DESC')->first()->id;
 
         return response()->json($persons);
     }
