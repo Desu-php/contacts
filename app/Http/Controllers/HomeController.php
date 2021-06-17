@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LogActivity;
+use App\Models\Person;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
@@ -23,6 +26,24 @@ class HomeController extends Controller
      */
     public function index()
     {
+//        $persons = Person::where('user_id', Auth::id())
+//            ->with([
+//                'tags',
+//                'notes.file',
+//                'cities',
+//                'companies',
+//                'links',
+//                'files',
+//                'activities',
+//                'contacts',
+//                'infos',
+//                'connections',
+//                'multiplelds'
+//            ])
+//            ->where('me', 0)
+//            ->paginate();;
+//        $log = LogActivity::where('user_id', Auth::id())
+//            ->orderBy('id', 'DESC')->first();
         return view('home');
     }
 }
