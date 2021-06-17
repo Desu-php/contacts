@@ -46,7 +46,7 @@ class Person extends Model
 
     public function tags()
     {
-        return $this->belongsToMany(Tag::class, 'person_tags', 'person_id', 'tag_id');
+        return $this->belongsToMany(Tag::class, 'person_tags', 'tag_id', 'person_id');
     }
 
     public function cities()
