@@ -36,7 +36,10 @@ class LogActivityController extends Controller
         }
 
         foreach ($request->logs as $log) {
-            ;
+
+            $log['changes']['values'] = $this->toLower($log['changes']['values']);
+            $log['changes']['where'] = $this->toLower($log['changes']['where']);
+
             $result = [];
             switch ($log['changes']['action']) {
                 case 'add':
@@ -53,7 +56,7 @@ class LogActivityController extends Controller
                     break;
                 default:
                     $result = ['success' => false, 'message' => 'Action не найден'];
-                    return true;
+                    break;
             }
 
             if (!$result['success']) {
@@ -206,5 +209,15 @@ class LogActivityController extends Controller
             'data' => $logActivities->get()
         ]);
 
+    }
+
+    private function toLower($data)
+    {
+        foreach ($data as $key => $datum){
+            if (Str::contains(Str::lower($key), 'id')){
+                $data[$key] = Str::lower($datum);
+            }
+        }
+        return $data;
     }
 }
