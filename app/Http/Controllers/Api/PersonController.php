@@ -37,11 +37,10 @@ class PersonController extends Controller
         return response()->json(['data' => $persons, 'last_id' => !is_null($log)?$log->id:null]);
     }
 
-    public function uploadImage(Request $request)
+    public function upload(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'image' => 'required|file|mimes:png,jpeg,jpg,webp,gif',
-            'person_id' => 'required|exists:persons,id'
+            'file' => 'required|file',
         ]);
 
         if ($validator->fails()) {
@@ -50,12 +49,7 @@ class PersonController extends Controller
             ], 400);
         }
 
-        $filePath = $this->uploadFile($request->file('image'), 'thumbnailImages');
-
-        Person::where('id', $request->person_id)
-            ->update([
-                'thumbnailImage' => $filePath
-            ]);
+        $filePath = $this->uploadFile($request->file('file'), 'files');
 
         return response()->json($filePath);
     }

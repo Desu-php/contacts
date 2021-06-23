@@ -32,7 +32,7 @@ Route::group([
 
 Route::group(['namespace' => 'Api','middleware' => ['auth:api'],], function (){
     Route::get('get_list_persons', 'PersonController@get_list_persons');
-    Route::post('person/upload', 'PersonController@uploadImage');
+    Route::post('person/upload', 'PersonController@upload');
     Route::post('change_user_info', 'PersonController@change_user_info');
     Route::get('get_user_info', 'PersonController@get_user_info');
 
