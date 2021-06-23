@@ -66,7 +66,7 @@ class Person extends Model
 
     public function connections()
     {
-        return $this->belongsToMany(Company::class, 'person_connections', 'with_whom', 'who', 'id', 'id');
+        return $this->belongsToMany(Person::class, 'person_connections', 'with_whom', 'who', 'id', 'id');
     }
 
     public function contacts()
