@@ -21,7 +21,9 @@ class Person extends Model
         'thumbnailImage',
         'user_id',
         'me',
-        'id'
+        'id',
+        'lat',
+        'lon'
     ];
 
     public function user()

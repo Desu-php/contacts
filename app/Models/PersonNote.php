@@ -16,8 +16,6 @@ class PersonNote extends Model
         'person_id',
         'address',
         'text',
-        'note',
-        'type',
         'protected',
         'lat',
         'lon',
