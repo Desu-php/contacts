@@ -15,4 +15,6 @@ class PersonConnection extends Model
         'with_whom',
         'who'
     ];
+
+    public $timestamps = false;
 }
