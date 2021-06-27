@@ -13,7 +13,7 @@ class CityController extends Controller
 
     public function get_list_towns()
     {
-        return response()->json(City::select(['name', 'lat', 'lon', 'user_id', 'public'])
+        return response()->json(City::select(['id','name', 'lat', 'lon', 'user_id', 'public'])
             ->where('public', City::PUBLIC)
             ->orWhereHas('user', function (Builder $builder){
                 $builder->where('user_id', Auth::id());
