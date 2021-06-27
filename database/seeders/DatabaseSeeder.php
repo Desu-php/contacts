@@ -33,22 +33,10 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // \App\Models\User::factory(10)->create();
-        Person::factory(20)->create();
-        PersonLink::factory(50)->create();
-        File::factory(50)->create();
-        PersonNote::factory(50)->create();
-        PersonFile::factory(50)->create();
-        Tag::factory(50)->create();
-        PersonTag::factory(50)->create();
-        City::factory(50)->create();
-        PersonCity::factory(50)->create();
-        Activity::factory(50)->create();
-        PersonActivity::factory(50)->create();
-        Company::factory(50)->create();
-        PersonCompany::factory(50)->create();
-        ContactType::factory(5)->create();
-        PersonContact::factory(50)->create();
-        PersonInfo::factory(50)->create();
-        PersonInfoValue::factory(50)->create();
+
+        $this->call([
+            CitiesSeeder::class,
+            ActivitySeeder::class
+        ]);
     }
 }

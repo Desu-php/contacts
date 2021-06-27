@@ -4,7 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\City;
-use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class CityController extends Controller
 {
@@ -12,7 +13,12 @@ class CityController extends Controller
 
     public function get_list_towns()
     {
-        return response()->json(City::select(['name', 'lat', 'lon'])->get());
+        return response()->json(City::select(['name', 'lat', 'lon', 'user_id'])
+            ->where('public', City::PUBLIC)
+            ->orWhereHas('user', function (Builder $builder){
+                $builder->where('user_id', Auth::id());
+            })
+            ->get());
     }
 
     public function get_list_city()
