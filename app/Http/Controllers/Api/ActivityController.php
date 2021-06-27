@@ -18,7 +18,7 @@ class ActivityController extends Controller
 
     public function get_list_activities()
     {
-        return response()->json(Activity::select('id','name', 'user_id')
+        return response()->json(Activity::select('id','name', 'user_id', 'public')
             ->where('public', Activity::PUBLIC)
             ->orWhereHas('user', function (Builder  $builder){
                 return $builder->where('user_id', Auth::id());
