@@ -3,18 +3,21 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Person;
 use App\Models\Sharing;
 use App\Models\SharingUser;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 
 class SharingController extends Controller
 {
     //
     use \App\Traits\Sharing;
+
     public function store(Request $request)
     {
         $validator = $this->validations($request);
@@ -116,7 +119,6 @@ class SharingController extends Controller
     }
 
 
-
     public function destroy($id)
     {
         $sharing = Sharing::where('user_id', Auth::id())
@@ -197,12 +199,46 @@ class SharingController extends Controller
 
     public function get_sharings_list()
     {
-        return response()->json([
-            Sharing::whereHas('users', function (Builder $builder) {
-                $builder->where('users.id', Auth::id())
-                    ->where('access', SharingUser::ACCESS_ALLOWED);
-            })->get()
-        ]);
+        $with = ['tags_ids', 'cities_ids', 'activities_ids', 'companies_ids'];
+
+        $sharing_list = Sharing::whereHas('users', function (Builder $builder) {
+            $builder->where('users.id', Auth::id())
+                ->where('access', SharingUser::ACCESS_ALLOWED);
+        })->with(['user' => function ($query) {
+            $query->select(['id']);
+            $query->with(['profile' => function ($query) {
+                $query->select(['givenName', 'familyName', 'middleName', 'user_id', 'thumbnailImage']);
+            }]);
+        }])->with($with)
+            ->get();
+
+
+        $sharing_list->map(function ($sharing) use ($with) {
+            $persons = Person::where('user_id', Auth::id())->where('me', 0);
+            foreach ($with as $value) {
+                $persons = $this->sharingConditions($sharing, $persons, $value, str_replace('_ids', '', $value));
+            }
+
+            $sharing->persons_count = $persons->count();
+        });
+
+        return response()->json(
+            $sharing_list
+        );
+    }
+
+    private function sharingConditions($sharing, $persons, $relations, $whereHas)
+    {
+        foreach ($sharing->$relations as $relation_id) {
+            return $persons->where(function ($query) use ($relation_id, $whereHas) {
+                $query->orWhereHas($whereHas, function ($query) use ($relation_id, $whereHas) {
+                    $singular = Str::singular($whereHas).'_id';
+                    $query->where($whereHas . '.id', $relation_id->$singular);
+                });
+            });
+
+        }
+        return $persons;
     }
 
     public function get_sharing_access_users($id)
@@ -254,7 +290,7 @@ class SharingController extends Controller
                 ->orWhereHas('companies', function (Builder $builder) use ($query) {
                     $builder->where('name', 'LIKE', '%' . $query . '%');
                 });
-        })->where(function (Builder  $builder) use ($query){
+        })->where(function (Builder $builder) use ($query) {
             $builder->orWhereHas('user.persons.tags', function (Builder $builder) use ($query) {
                 $builder->where('name', 'LIKE', '%' . $query . '%');
             })
@@ -267,8 +303,8 @@ class SharingController extends Controller
                 ->orWhereHas('user.persons.companies', function (Builder $builder) use ($query) {
                     $builder->where('name', 'LIKE', '%' . $query . '%');
                 });
-        })->with(['user.persons' => function($builder) use($query){
-            $builder->where(function (Builder $builder) use($query){
+        })->with(['user.persons' => function ($builder) use ($query) {
+            $builder->where(function (Builder $builder) use ($query) {
                 $builder->orWhereHas('tags', function (Builder $builder) use ($query) {
                     $builder->where('name', 'LIKE', '%' . $query . '%');
                 })
@@ -282,7 +318,7 @@ class SharingController extends Controller
                         $builder->where('name', 'LIKE', '%' . $query . '%');
                     });
             });
-            $builder->with( [
+            $builder->with([
                 'companies',
                 'activities',
                 'cities',
@@ -293,8 +329,8 @@ class SharingController extends Controller
 
         $results = $sharings->map(function ($sharing) {
             if ($sharing->type_access == SharingUser::ACCESS_DENIED) {
-                 $sharing->user->persons->map(function ($item){
-                     unset($item->activities);
+                $sharing->user->persons->map(function ($item) {
+                    unset($item->activities);
                 });
             }
             return $sharing;

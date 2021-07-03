@@ -50,4 +50,20 @@ class Sharing extends Model
     {
         return $this->belongsToMany(Tag::class, 'sharing_tags');
     }
+
+    public function cities_ids(){
+        return $this->hasMany(SharingCity::class);
+    }
+
+    public function activities_ids(){
+        return $this->hasMany(SharingActivity::class);
+    }
+
+    public function tags_ids(){
+        return $this->hasMany(SharingTag::class);
+    }
+
+    public function companies_ids(){
+        return $this->hasMany(SharingCompany::class);
+    }
 }
