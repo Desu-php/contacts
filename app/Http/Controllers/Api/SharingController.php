@@ -212,7 +212,6 @@ class SharingController extends Controller
         }])->with($with)
             ->get();
 
-
         $sharing_list->map(function ($sharing) use ($with) {
             $persons = Person::where('user_id', Auth::id())->where('me', 0);
             foreach ($with as $value) {
@@ -236,7 +235,6 @@ class SharingController extends Controller
                     $query->where($whereHas . '.id', $relation_id->$singular);
                 });
             });
-
         }
         return $persons;
     }
