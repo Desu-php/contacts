@@ -8,4 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class SharingActivity extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'not'
+    ];
 }

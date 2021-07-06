@@ -57,6 +57,6 @@ class User extends Authenticatable
 
     public function persons()
     {
-        return $this->hasMany(Person::class);
+        return $this->hasMany(Person::class)->where('me', 0);
     }
 }

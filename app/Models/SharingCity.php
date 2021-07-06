@@ -8,4 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class SharingCity extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'not'
+    ];
 }

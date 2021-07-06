@@ -18,6 +18,8 @@ class SharingController extends Controller
     //
     use \App\Traits\Sharing;
 
+    private $sharingWith = ['tags_ids', 'cities_ids', 'activities_ids', 'companies_ids'];
+
     public function store(Request $request)
     {
         $validator = $this->validations($request);
@@ -47,22 +49,21 @@ class SharingController extends Controller
 
     private function attaches($sharing, $conditions, $delete = false)
     {
-        $this->attach('tags', $sharing, $conditions, $delete);
-        $this->attach('cities', $sharing, $conditions, $delete);
-        $this->attach('activities', $sharing, $conditions, $delete);
-        $this->attach('companies', $sharing, $conditions, $delete);
+        $tables = ['tags', 'cities', 'activities', 'companies'];
+
+        foreach ($tables as $table) {
+            $this->attach($table, $sharing, $conditions, $delete);
+        }
     }
 
     private function attach($key, $sharing, $conditions, $delete = false)
     {
-        $method = $key;
-
         if ($delete) {
-            $sharing->$method()->delete();
+            $sharing->$key()->delete();
         }
 
-        foreach ($conditions[$key] as $tag) {
-            $sharing->$method()->attach($tag);
+        foreach ($conditions[$key] as $value) {
+            $sharing->$key()->attach($value['id'], ['not' => $value['not']]);
         }
     }
 
@@ -108,13 +109,18 @@ class SharingController extends Controller
             'open' => 'required|numeric',
             'conditions' => 'required|array',
             'conditions.cities' => 'nullable|array',
-            'conditions.cities.*' => 'nullable|exists:cities,id',
+            'conditions.cities.*.id' => 'required|exists:cities,id',
+            'conditions.cities.*.not' => 'required|boolean',
             'conditions.tags' => 'nullable|array',
-            'conditions.tags.*' => 'nullable|exists:tags,id',
+            'conditions.tags.*.id' => 'required|exists:tags,id',
+            'conditions.tags.*.not' => 'required|boolean',
             'conditions.companies' => 'nullable|array',
-            'conditions.companies.*' => 'nullable|exists:companies,id',
+            'conditions.companies.*.id' => 'required|exists:companies,id',
+            'conditions.companies.*.not' => 'required|boolean',
             'conditions.activities' => 'nullable|array',
-            'conditions.activities.*' => 'nullable|exists:activities,id',
+            'conditions.activities.*.id' => 'required|exists:activities,id',
+            'conditions.activities.*.not' => 'required|boolean',
+
         ]);
     }
 
@@ -163,7 +169,7 @@ class SharingController extends Controller
         $sharingUser->update(['access' => SharingUser::ACCESS_DENIED]);
 
         return response()->json([
-            'message' => 'Доступ успешно закрыть'
+            'message' => 'Доступ успешно закрыт'
         ]);
     }
 
@@ -199,7 +205,6 @@ class SharingController extends Controller
 
     public function get_sharings_list()
     {
-        $with = ['tags_ids', 'cities_ids', 'activities_ids', 'companies_ids'];
 
         $sharing_list = Sharing::whereHas('users', function (Builder $builder) {
             $builder->where('users.id', Auth::id())
@@ -209,21 +214,26 @@ class SharingController extends Controller
             $query->with(['profile' => function ($query) {
                 $query->select(['givenName', 'familyName', 'middleName', 'user_id', 'thumbnailImage']);
             }]);
-        }])->with($with)
-            ->get();
+        }])->with($this->sharingWith)->get();
 
-        $sharing_list->map(function ($sharing) use ($with) {
-            $persons = Person::where('user_id', Auth::id())->where('me', 0);
-            foreach ($with as $value) {
+        $sharing_list = $this->sharingUsers($sharing_list);
+
+        return response()->json(
+            $sharing_list
+        );
+    }
+
+    private function sharingUsers($sharings)
+    {
+        $sharings->map(function ($sharing) {
+            $persons = Person::where('user_id', $sharing->user_id)->where('me', 0);
+            foreach ($this->sharingWith as $value) {
                 $persons = $this->sharingConditions($sharing, $persons, $value, str_replace('_ids', '', $value));
             }
 
             $sharing->persons_count = $persons->count();
         });
-
-        return response()->json(
-            $sharing_list
-        );
+        return $sharings;
     }
 
     private function sharingConditions($sharing, $persons, $relations, $whereHas)
@@ -231,7 +241,7 @@ class SharingController extends Controller
         foreach ($sharing->$relations as $relation_id) {
             return $persons->where(function ($query) use ($relation_id, $whereHas) {
                 $query->orWhereHas($whereHas, function ($query) use ($relation_id, $whereHas) {
-                    $singular = Str::singular($whereHas).'_id';
+                    $singular = Str::singular($whereHas) . '_id';
                     $query->where($whereHas . '.id', $relation_id->$singular);
                 });
             });
@@ -335,5 +345,66 @@ class SharingController extends Controller
         });
 
         return response()->json($results);
+    }
+
+    public function get_my_sharing_list(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'open' => 'nullable|boolean'
+        ]);
+
+        if ($validator->fails()){
+            return  response()->json([
+                'errors' => $validator->getMessageBag()
+            ],400);
+        }
+
+        $sharings = Sharing::where('user_id', Auth::id())
+            ->withCount('users')
+            ->with($this->sharingWith);
+
+        if ($request->has('open')){
+            $sharings->where('open', $request->open);
+        }
+
+        $sharings = $sharings->paginate();
+
+        $sharings = $this->sharingUsers($sharings);
+
+
+        return response()->json($sharings);
+    }
+
+    public function unsubscribe($id)
+    {
+        $sharingUser = SharingUser::where('sharing_id', $id)
+            ->where('user_id', Auth::id())->delete();
+
+        return response()->json($sharingUser);
+    }
+
+    public function get_sharing_persons($id)
+    {
+        $sharing = Sharing::whereHas('users', function (Builder $builder) {
+            $builder->where('users.id', Auth::id())
+                ->where('access', SharingUser::ACCESS_ALLOWED);
+        })->where('id', $id)->first();
+
+        if (is_null($sharing)) {
+            return response()->json([
+                'error' => 'Sharing not found'
+            ], 404);
+        }
+        $persons = $sharing->user->persons()->with([
+            'tags',
+            'cities',
+            'activities',
+            'connections'
+        ]);
+        foreach ($this->sharingWith as $value) {
+            $persons = $this->sharingConditions($sharing, $persons, $value, str_replace('_ids', '', $value));
+        }
+
+        return response()->json($persons->paginate());
     }
 }
