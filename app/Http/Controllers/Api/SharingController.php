@@ -59,7 +59,7 @@ class SharingController extends Controller
     private function attach($key, $sharing, $conditions, $delete = false)
     {
         if ($delete) {
-            $sharing->$key()->delete();
+           $sharing->$key()->detach();
         }
 
         foreach ($conditions[$key] as $value) {
