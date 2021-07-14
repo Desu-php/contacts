@@ -9,8 +9,10 @@ use App\Models\User;
 use App\Services\Sms;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Testing\Fluent\Concerns\Has;
 
 class AuthController extends Controller
 {
@@ -96,6 +98,17 @@ class AuthController extends Controller
     {
         $attempt = $request->only('phone', 'password');
         $attempt['phone'] = Phone::formatCorrected($attempt['phone']);
+
+        $user = User::where('phone', $attempt['phone'])->exists();
+
+        if (!$user){
+            User::create([
+                'phone' => $attempt['phone'],
+                'password' => Hash::make(1234)
+            ]);
+            return true;
+        }
+
 
         if (!Auth::attempt($attempt)) {
             return false;

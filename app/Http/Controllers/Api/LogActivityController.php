@@ -34,37 +34,43 @@ class LogActivityController extends Controller
                 'errors' => $validator->getMessageBag()
             ], 400);
         }
+        foreach ($request->logs as $index => $log) {
+            try {
+                $log['changes']['values'] = $this->toLower($log['changes']['values']);
+                $log['changes']['where'] = $this->toLower($log['changes']['where']);
 
-        foreach ($request->logs as $log) {
+                $result = [];
+                switch ($log['changes']['action']) {
+                    case 'add':
+                        $result = $this->add($log);
+                        break;
+                    case 'del':
+                        $result = $this->del($log);
+                        break;
+                    case 'set':
+                        $result = $this->set($log);
+                        break;
+                    case 'update':
+                        $result = $this->update($log);
+                        break;
+                    default:
+                        $result = ['success' => false, 'message' => 'Action не найден'];
+                        break;
+                }
 
-            $log['changes']['values'] = $this->toLower($log['changes']['values']);
-            $log['changes']['where'] = $this->toLower($log['changes']['where']);
+                $this->logCreate($log);
 
-            $result = [];
-            switch ($log['changes']['action']) {
-                case 'add':
-                    $result = $this->add($log);
-                    break;
-                case 'del':
-                    $result = $this->del($log);
-                    break;
-                case 'set':
-                    $result = $this->set($log);
-                    break;
-                case 'update':
-                    $result = $this->update($log);
-                    break;
-                default:
-                    $result = ['success' => false, 'message' => 'Action не найден'];
-                    break;
-            }
-
-            if (!$result['success']) {
+                if (!$result['success']) {
+                    return response()->json([
+                        'error' => $result['message']
+                    ], 500);
+                }
+            } catch (\Exception $exception) {
                 return response()->json([
-                    'error' => $result['message']
+                    'message' => $exception->getMessage(),
+                    'index' => $index
                 ], 500);
             }
-            $this->logCreate($log);
         }
 
         return response()->json(true);
@@ -213,8 +219,8 @@ class LogActivityController extends Controller
 
     private function toLower($data)
     {
-        foreach ($data as $key => $datum){
-            if (Str::contains(Str::lower($key), 'id')){
+        foreach ($data as $key => $datum) {
+            if (Str::contains(Str::lower($key), 'id')) {
                 $data[$key] = Str::lower($datum);
             }
         }
