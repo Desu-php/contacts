@@ -68,7 +68,7 @@ class LogActivityController extends Controller
             } catch (\Exception $exception) {
                 return response()->json([
                     'message' => $exception->getMessage(),
-                    'index' => $index
+                    'index' => $log['changes']['index']
                 ], 500);
             }
         }

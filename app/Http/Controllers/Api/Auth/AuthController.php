@@ -12,11 +12,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Testing\Fluent\Concerns\Has;
 
 class AuthController extends Controller
 {
     //
+    const Password = 'Passw0rd';
 
     /**
      * Get a JWT via given credentials.
@@ -27,7 +27,6 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'phone' => 'required|phone_number',
-            'password' => 'required|string',
         ]);
 
         if ($validator->fails()) {
@@ -65,7 +64,6 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'phone' => 'required|phone_number',
-            'password' => 'required|string',
             'code' => 'required|code:' . Phone::formatCorrected($request->phone) . '|code_try:' . Phone::formatCorrected($request->phone),
         ]);
 
@@ -77,7 +75,7 @@ class AuthController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        return $this->getTokenAndRefreshToken($request->input('phone'), $request->input('password'));
+        return $this->getTokenAndRefreshToken($request->input('phone'), self::Password);
     }
 
     private function getTokenAndRefreshToken($phone, $password)
@@ -90,21 +88,21 @@ class AuthController extends Controller
             'password' => $password,
             'scope' => ''
         ]);
-
         return $response->json();
     }
 
     private function authCheck($request)
     {
-        $attempt = $request->only('phone', 'password');
+        $attempt = $request->only('phone');
         $attempt['phone'] = Phone::formatCorrected($attempt['phone']);
+        $attempt['password'] = self::Password;
 
         $user = User::where('phone', $attempt['phone'])->exists();
 
         if (!$user){
             User::create([
                 'phone' => $attempt['phone'],
-                'password' => Hash::make(1234)
+                'password' => Hash::make(self::Password)
             ]);
             return true;
         }
