@@ -7,14 +7,14 @@ use App\Http\Controllers\Controller;
 use App\Models\SmsCode;
 use App\Providers\RouteServiceProvider;
 use App\Services\Sms;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Validator;
+
 
 class LoginController extends Controller
 {
+    const PASSWORD = 'Passw0rd';
     /*
     |--------------------------------------------------------------------------
     | Login Controller
@@ -34,8 +34,9 @@ class LoginController extends Controller
 
     private function authCheck($request)
     {
-        $attempt = $request->only('phone', 'password');
+        $attempt = $request->only('phone');
         $attempt['phone'] = Phone::formatCorrected($attempt['phone']);
+        $attempt['password'] = self::PASSWORD;
 
         if (!Auth::attempt($attempt)) {
             return false;
@@ -53,7 +54,6 @@ class LoginController extends Controller
     {
         $this->validate($request, [
             'phone' => 'required|phone_number',
-            'password' => 'required|string',
         ]);
 
 
@@ -80,7 +80,6 @@ class LoginController extends Controller
         ]);
 
         Session::flash('phone', $request->phone);
-        Session::flash('password', $request->password);
         Session::flash('status', true);
         return back();
     }
