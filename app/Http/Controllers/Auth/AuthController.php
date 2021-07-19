@@ -14,11 +14,11 @@ use Illuminate\Support\Facades\Validator;
 class AuthController extends Controller
 {
     //
+    const PASSWORD = 'Passw0rd';
     public function checkCode(Request $request)
     {
         $this->validate($request,[
             'phone' => 'required|phone_number',
-            'password' => 'required|string',
             'code' => 'required|code:' . Phone::formatCorrected($request->phone) . '|code_try:' . Phone::formatCorrected($request->phone),
         ]);
 
@@ -31,8 +31,9 @@ class AuthController extends Controller
 
     private function authCheck($request)
     {
-        $attempt = $request->only('phone', 'password');
+        $attempt = $request->only('phone');
         $attempt['phone'] = Phone::formatCorrected($attempt['phone']);
+        $attempt['password'] = self::PASSWORD;
 
         if (!Auth::attempt($attempt)) {
             return false;
