@@ -3,6 +3,12 @@
 @section('content')
     <div class="container" id="login">
         <div class="row justify-content-center">
+            @if(Session::has('sharingText'))
+            <div class="alert alert-primary col-md-7" role="alert">
+                <h4 class="alert-heading">NetApp</h4>
+                <p> - Вам предоставляется доступ к одному из списков {{Session::get('sharingText')}}, для подтверждения войдите в систему.</p>
+            </div>
+            @endif
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-header">Войти</div>

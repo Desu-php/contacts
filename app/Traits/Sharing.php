@@ -55,7 +55,7 @@ trait Sharing
                 'message' => 'Доступ к списку получен'
             ]);
         }else{
-            return 'Доступ к списку получен';
+            return view('sharing');
         }
 
     }

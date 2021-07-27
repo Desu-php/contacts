@@ -59,4 +59,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Person::class)->where('me', 0);
     }
+
+    public function sharings()
+    {
+        return $this->hasMany(Sharing::class);
+    }
 }
