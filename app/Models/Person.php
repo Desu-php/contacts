@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
+use App\Traits\PerPage;
 use App\Traits\Uuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Person extends Model
 {
+    use HasFactory,Uuids, PerPage;
+
     protected $table = 'persons';
-    use HasFactory,Uuids;
 
     protected $fillable = [
         'givenName',

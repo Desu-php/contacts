@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\PerPage;
 use App\Traits\Uuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Sharing extends Model
 {
-    use HasFactory, Uuids;
+    use HasFactory, Uuids, PerPage;
 
     const OPEN = 1;
     const CLOSE = 0;
