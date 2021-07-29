@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Person extends Model
 {
-    use HasFactory,Uuids, PerPage;
+    use HasFactory,Uuids;
 
     protected $table = 'persons';
 
@@ -27,6 +27,8 @@ class Person extends Model
         'lat',
         'lon'
     ];
+
+    protected $perPage = 50;
 
     public function user()
     {
