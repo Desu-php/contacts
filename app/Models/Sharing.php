@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Sharing extends Model
 {
-    use HasFactory, Uuids
+    use HasFactory, Uuids;
 
     const OPEN = 1;
     const CLOSE = 0;
