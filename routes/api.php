@@ -71,5 +71,9 @@ Route::group(['namespace' => 'Api','middleware' => ['auth:api'],], function (){
     Route::delete('sharing/unsubscribe/{id}', 'SharingController@unsubscribe');
     Route::get('get_sharing_persons/{id}', 'SharingController@get_sharing_persons');
     Route::get('get_my_sharing_list', 'SharingController@get_my_sharing_list');
+
+    Route::group(['prefix' => 'user'], function (){
+        Route::delete('/', 'UserController@destroy');
+    });
 //    Route::delete('sharing_users_access_off', 'SharingController@sharing_users_access_off');
 });

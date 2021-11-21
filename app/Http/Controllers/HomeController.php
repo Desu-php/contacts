@@ -24,8 +24,11 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function index()
+    public function index(Request $request)
     {
+        $sharingPerson = new Api\SharingController();
+        $response =  $sharingPerson->get_sharing_persons('ekolog');
+
 //        $persons = Person::where('user_id', Auth::id())
 //            ->with([
 //                'tags',

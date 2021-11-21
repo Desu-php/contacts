@@ -210,7 +210,7 @@ class SharingController extends Controller
             $builder->where('users.id', Auth::id())
                 ->where('access', SharingUser::ACCESS_ALLOWED);
         })->with(['user' => function ($query) {
-            $query->select(['id']);
+            $query->select(['id','phone']);
             $query->with(['profile' => function ($query) {
                 $query->select(['givenName', 'familyName', 'middleName', 'user_id', 'thumbnailImage']);
             }]);
@@ -395,6 +395,7 @@ class SharingController extends Controller
                 'error' => 'Sharing not found'
             ], 404);
         }
+
         $persons = $sharing->user->persons()->with([
             'tags',
             'cities',
