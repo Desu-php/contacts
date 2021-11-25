@@ -37,7 +37,7 @@ Route::group(['namespace' => 'Api','middleware' => ['auth:api'],], function (){
     Route::get('get_user_info', 'PersonController@get_user_info');
 
     Route::get('get_list_towns', 'CityController@get_list_towns');
-    Route::get('get_list_city', 'CityController@get_list_city');
+    Route::get(' ', 'CityController@get_list_city');
 
     Route::get('get_list_activity', 'ActivityController@get_list_activity');
     Route::get('get_list_activities', 'ActivityController@get_list_activities');
@@ -71,6 +71,7 @@ Route::group(['namespace' => 'Api','middleware' => ['auth:api'],], function (){
     Route::delete('sharing/unsubscribe/{id}', 'SharingController@unsubscribe');
     Route::get('get_sharing_persons/{id}', 'SharingController@get_sharing_persons');
     Route::get('get_my_sharing_list', 'SharingController@get_my_sharing_list');
+    Route::get('get_sharing/{id}', 'SharingController@getSharing');
 
     Route::group(['prefix' => 'user'], function (){
         Route::delete('/', 'UserController@destroy');

@@ -27,7 +27,7 @@ class HomeController extends Controller
     public function index(Request $request)
     {
         $sharingPerson = new Api\SharingController();
-        $response =  $sharingPerson->get_sharing_persons('ekolog');
+        $response =  $sharingPerson->search($request);
 
 //        $persons = Person::where('user_id', Auth::id())
 //            ->with([
