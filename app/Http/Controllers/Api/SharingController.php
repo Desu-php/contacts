@@ -289,91 +289,63 @@ class SharingController extends Controller
             'tags'
         ];
 
+        $sharings = Sharing::whereHas('users', function ($query) {
+            $query->where('users.id', Auth::id())
+                ->where('access', Sharing::OPEN);
+        })->with($with)->get();
+
         $persons = Auth::user()->persons()
-            ->where(function ($query) use ($with, $search) {
-                $query->where(DB::raw("CONCAT(`givenName`, ' ', `familyName`, ' ', `middleName`)"), 'LIKE', '%' . $search . '%');
+            ->where(function ($query) use ($search, $with) {
+                $query->where('givenName', 'LIKE', '%' . $search . '%');
+                $query->orWhere('familyName', 'LIKE', '%' . $search . '%');
+                $query->orWhere('middleName', 'LIKE', '%' . $search . '%');
                 $this->conditionsLike($query, $with, $search);
-            })->orWhere(function ($query) use ($with, $search) {
-                $query->whereHas('user.sharings', function ($query) use ($with, $search) {
-                    $query->whereHas('users', function ($query) use ($with, $search) {
-                        $query->where('users.id', Auth::id())
-                            ->where('access', Sharing::OPEN);
-
-                        $query->whereHas('persons', function ($query) use ($with, $search) {
-                            $this->conditionsLike($query,$with, $search);
+            })
+            ->orWhere(function ($query) {
+                $query->whereHas('user.sharings', function ($query) {
+                    $query->where('user_id', '<>', Auth::id())
+                        ->whereHas('users', function ($query) {
+                            $query->where('users.id', Auth::id())
+                                ->where('access', Sharing::OPEN);
                         });
-
-                    });
-
-                    $query->where(function ($query) use ($with, $search) {
-                        $this->conditionsLike($query, $with, $search);
-                    });
-
                 });
-            })->with($with);
+            })
+            ->with($with)->get();
 
-        $persons->get();
-//        dd($persons->get());
-//        $sharings = Sharing::whereHas('users', function (Builder $builder) {
-//            $builder->where('users.id', Auth::id())
-//                ->where('access', SharingUser::ACCESS_ALLOWED);
-//        })->where(function (Builder $builder) use ($query) {
-//            $builder->where('name', 'LIKE', '%' . $query . '%')
-//                ->orWhereHas('tags', function (Builder $builder) use ($query) {
-//                    $builder->where('name', 'LIKE', '%' . $query . '%');
-//                })
-//                ->orWhereHas('cities', function (Builder $builder) use ($query) {
-//                    $builder->where('name', 'LIKE', '%' . $query . '%');
-//                })
-//                ->orWhereHas('activities', function (Builder $builder) use ($query) {
-//                    $builder->where('name', 'LIKE', '%' . $query . '%');
-//                })
-//                ->orWhereHas('companies', function (Builder $builder) use ($query) {
-//                    $builder->where('name', 'LIKE', '%' . $query . '%');
-//                });
-//        })->where(function (Builder $builder) use ($query) {
-//            $builder->orWhereHas('user.persons.tags', function (Builder $builder) use ($query) {
-//                $builder->where('name', 'LIKE', '%' . $query . '%');
-//            })
-//                ->orWhereHas('user.persons.cities', function (Builder $builder) use ($query) {
-//                    $builder->where('name', 'LIKE', '%' . $query . '%');
-//                })
-//                ->orWhereHas('user.persons.activities', function (Builder $builder) use ($query) {
-//                    $builder->where('name', 'LIKE', '%' . $query . '%');
-//                })
-//                ->orWhereHas('user.persons.companies', function (Builder $builder) use ($query) {
-//                    $builder->where('name', 'LIKE', '%' . $query . '%');
-//                });
-//        })->with(['user.persons' => function ($builder) use ($query, $with) {
-//            $builder->where(function (Builder $builder) use ($query) {
-//                $builder->orWhereHas('tags', function (Builder $builder) use ($query) {
-//                    $builder->where('name', 'LIKE', '%' . $query . '%');
-//                })
-//                    ->orWhereHas('cities', function (Builder $builder) use ($query) {
-//                        $builder->where('name', 'LIKE', '%' . $query . '%');
-//                    })
-//                    ->orWhereHas('activities', function (Builder $builder) use ($query) {
-//                        $builder->where('name', 'LIKE', '%' . $query . '%');
-//                    })
-//                    ->orWhereHas('companies', function (Builder $builder) use ($query) {
-//                        $builder->where('name', 'LIKE', '%' . $query . '%');
-//                    });
-//            });
-//            $builder->with($with);
-//        }])->get();
+        $uniqPersons = [];
+        foreach ($sharings->groupBy('user_id') as $id => $sharing) {
+            $tempPersons = $persons->where('user_id', $id);
+            foreach ($sharing as $value) {
+                foreach ($tempPersons as $person) {
+                    if (!in_array($person, $uniqPersons)) {
+                        $filteredPerson = $this->collectionFilter($person, $value->getRelations(), $search);
+                        if (!is_null($filteredPerson)) {
+                            $uniqPersons[] = $filteredPerson;
+                        }
+                    }
+                }
+            }
+        }
 
+        return response()->json($persons->where('user_id', Auth::id())->merge($uniqPersons));
+    }
 
-//        $results = $sharings->map(function ($sharing) {
-//            if ($sharing->type_access == SharingUser::ACCESS_DENIED) {
-//                $sharing->user->persons->map(function ($item) {
-//                    unset($item->activities);
-//                });
-//            }
-//            return $sharing;
-//        });
-        $results = [];
+    private function collectionFilter($collection, $relations, $search)
+    {
+        foreach ($relations as $key => $relation) {
+            $exists = $collection->$key->filter(function ($item) use ($search) {
+                return false !== stripos(Str::lower($item->name), Str::lower($search));
+            });
+            if ($exists->count() || $this->checkName($collection, $search)) {
+                return $collection;
+            }
+        }
+        return null;
+    }
 
-        return response()->json();
+    private function checkName($collection, $search)
+    {
+        return false !== stripos(Str::lower($collection->givenName . ' ' . $collection->familyName . ' ' . $collection->middleName), Str::lower($search));
     }
 
     private function conditionsLike($query, $conditions, $value)
