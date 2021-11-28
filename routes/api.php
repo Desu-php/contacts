@@ -73,6 +73,10 @@ Route::group(['namespace' => 'Api','middleware' => ['auth:api'],], function (){
     Route::get('get_my_sharing_list', 'SharingController@get_my_sharing_list');
     Route::get('get_sharing/{id}', 'SharingController@getSharing');
 
+    Route::group(['prefix' => 'countries'], function (){
+        Route::get('/', 'CountryController@getCountries');
+    });
+
     Route::group(['prefix' => 'user'], function (){
         Route::delete('/', 'UserController@destroy');
     });
