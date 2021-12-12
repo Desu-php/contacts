@@ -86,5 +86,13 @@ Route::group(['namespace' => 'Api','middleware' => ['auth:api'],], function (){
         Route::get('/', 'ScoreController@getScores');
         Route::get('indicator', 'ScoreController@getIndicator');
     });
+
+    Route::group(['prefix' => 'tasks'], function (){
+       Route::get('/', 'TaskController@getTasks');
+       Route::post('/', 'TaskController@store');
+       Route::delete('/{task}', 'TaskController@destroy');
+       Route::put('/{task}', 'TaskController@update');
+       Route::get('/statuses', 'TaskController@getStatuses');
+    });
 //    Route::delete('sharing_users_access_off', 'SharingController@sharing_users_access_off');
 });
