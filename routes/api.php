@@ -80,5 +80,11 @@ Route::group(['namespace' => 'Api','middleware' => ['auth:api'],], function (){
     Route::group(['prefix' => 'user'], function (){
         Route::delete('/', 'UserController@destroy');
     });
+
+    Route::group(['prefix' => 'scores'], function (){
+        Route::post('/', 'ScoreController@store');
+        Route::get('/', 'ScoreController@getScores');
+        Route::get('indicator', 'ScoreController@getIndicator');
+    });
 //    Route::delete('sharing_users_access_off', 'SharingController@sharing_users_access_off');
 });

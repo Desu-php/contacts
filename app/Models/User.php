@@ -64,4 +64,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Sharing::class);
     }
+
+    public function scores()
+    {
+        return $this->hasMany(Score::class);
+    }
 }
