@@ -15,15 +15,27 @@ class ScoreController extends Controller
 
     public function store(Request $request)
     {
-        $data = $this->validate($request, [
+        $this->validate($request, [
             'score' => 'required|numeric',
             'percent' => 'nullable|numeric|max:100'
         ]);
 
+        $score = $request->score;
+
+        $prevScore = auth()->user()
+            ->scores()
+            ->whereDate('created_at','<', now()->format('Y-m-d'))
+            ->latest()
+            ->first();
+
+        if (!is_null($prevScore)) {
+            $score = $prevScore->score - $score;
+        }
+
         auth()->user()
             ->scores()
             ->whereDate('created_at', now()->format('Y-m-d'))
-            ->updateOrCreate([], $data);
+            ->updateOrCreate([], ['score' => $score]);
 
         return response()->json([
             'message' => 'Успешно добавлен'
@@ -52,12 +64,12 @@ class ScoreController extends Controller
         $scores = Auth::user()->scores()->sum('score');
 
         $countUser = 0;
-        foreach ($users as $user){
-            if ($user->scores->sum('score') < $scores){
+        foreach ($users as $user) {
+            if ($user->scores->sum('score') < $scores) {
                 $countUser++;
             }
         }
 
-       return response()->json(round($countUser * 100 / $users->count()) );
+        return response()->json(round($countUser * 100 / $users->count()));
     }
 }
