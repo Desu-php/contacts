@@ -29,7 +29,7 @@ class ScoreController extends Controller
             ->first();
 
         if (!is_null($prevScore)) {
-            $score = $prevScore->score - $score;
+            $score -= $prevScore->score;
         }
 
         auth()->user()

@@ -12,6 +12,6 @@ class CountryController extends Controller
 
     public function getCountries()
     {
-        return response()->json(Country::paginate());
+        return response()->json(Country::all());
     }
 }

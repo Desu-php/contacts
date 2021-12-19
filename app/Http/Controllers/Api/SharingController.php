@@ -294,51 +294,73 @@ class SharingController extends Controller
                 ->where('access', Sharing::OPEN);
         })->with($with)->get();
 
-        $persons = Auth::user()->persons()
-            ->where(function ($query) use ($search, $with) {
-                $query->where('givenName', 'LIKE', '%' . $search . '%');
-                $query->orWhere('familyName', 'LIKE', '%' . $search . '%');
-                $query->orWhere('middleName', 'LIKE', '%' . $search . '%');
-                $this->conditionsLike($query, $with, $search);
-            })
-            ->orWhere(function ($query) {
-                $query->whereHas('user.sharings', function ($query) {
-                    $query->where('user_id', '<>', Auth::id())
-                        ->whereHas('users', function ($query) {
-                            $query->where('users.id', Auth::id())
-                                ->where('access', Sharing::OPEN);
-                        });
-                });
-            })
-            ->with($with)->get();
+        $persons = Person::where(function ($query) {
+            $query->whereHas('user.sharings', function ($query) {
+                $query->where('user_id', '<>', Auth::id())
+                    ->whereHas('users', function ($query) {
+                        $query->where('users.id', Auth::id())
+                            ->where('access', Sharing::OPEN);
+                    });
+            });
+        })->with($with)->get();
 
-        $uniqPersons = [];
+        $wherePersons = [];
+        $likePersons = [];
+        $neededPersons = [];
+
         foreach ($sharings->groupBy('user_id') as $id => $sharing) {
-            $tempPersons = $persons->where('user_id', $id);
+            $tempPersons = $persons->where('user_id', $id)->whereNotIn('id', $neededPersons);
             foreach ($sharing as $value) {
                 foreach ($tempPersons as $person) {
-                    if (!in_array($person, $uniqPersons)) {
+
+                    $wherePerson = $this->collectionWhere($person, $value->getRelations(), $search);
+
+                    if ($wherePerson) {
+                        $wherePersons[] = $wherePerson;
+                        $neededPersons[] = $wherePerson->id;
+                        continue;
+                    }
+
+                    if (!in_array($person, $wherePersons) && !in_array($person, $likePersons)) {
                         $filteredPerson = $this->collectionFilter($person, $value->getRelations(), $search);
                         if (!is_null($filteredPerson)) {
-                            $uniqPersons[] = $filteredPerson;
+                            $likePersons[] = $filteredPerson;
+                            $neededPersons[] = $filteredPerson->id;
                         }
                     }
                 }
             }
         }
 
-        return response()->json($persons->where('user_id', Auth::id())->merge($uniqPersons));
+        return response()->json(array_merge($wherePersons, $likePersons));
     }
 
     private function collectionFilter($collection, $relations, $search)
     {
+        if ($this->checkName($collection, $search)) {
+            return $collection;
+        }
+
         foreach ($relations as $key => $relation) {
-            $exists = $collection->$key->filter(function ($item) use ($search) {
+
+            if ($relation->isEmpty()) {
+                continue;
+            }
+
+            $relationNeeded = $relation->filter(function ($item) use ($search) {
                 return false !== stripos(Str::lower($item->name), Str::lower($search));
             });
-            if ($exists->count() || $this->checkName($collection, $search)) {
+
+            if ($relationNeeded->isEmpty()) {
+                continue;
+            }
+
+            $exists = $collection->$key->whereIn('id', $relationNeeded->pluck('id'));
+
+            if ($exists->isNotEmpty()) {
                 return $collection;
             }
+
         }
         return null;
     }
@@ -346,6 +368,37 @@ class SharingController extends Controller
     private function checkName($collection, $search)
     {
         return false !== stripos(Str::lower($collection->givenName . ' ' . $collection->familyName . ' ' . $collection->middleName), Str::lower($search));
+    }
+
+    private function checkNameWhere($collection, $search)
+    {
+        return $collection->givenName == $search || $collection->familyName == $search || $collection->middlename == $search;
+    }
+
+    private function collectionWhere($collection, $relations, $search)
+    {
+        if ($this->checkNameWhere($collection, $search)) {
+            return $collection;
+        }
+
+        foreach ($relations as $key => $relation) {
+            if ($relation->isEmpty()) {
+                continue;
+            }
+
+            $relationNeed = $relation->where('name', $search);
+
+            if ($relationNeed->isEmpty()) {
+                continue;
+            }
+
+            $exists = $collection->$key->whereIn('id', $relationNeed->pluck('id'));
+
+            if ($exists->isNotEmpty()) {
+                return $collection;
+            }
+        }
+        return null;
     }
 
     private function conditionsLike($query, $conditions, $value)
