@@ -25,11 +25,10 @@ class ScoreController extends Controller
         $prevScore = auth()->user()
             ->scores()
             ->whereDate('created_at','<', now()->format('Y-m-d'))
-            ->latest()
-            ->first();
+            ->sum('score');
 
         if (!is_null($prevScore)) {
-            $score -= $prevScore->score;
+            $score -= $prevScore;
         }
 
         auth()->user()
