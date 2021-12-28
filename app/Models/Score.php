@@ -13,7 +13,8 @@ class Score extends Model
     protected $fillable = [
         'score',
         'percent',
-        'user_id'
+        'user_id',
+        'request_score'
     ];
 
     public function user()

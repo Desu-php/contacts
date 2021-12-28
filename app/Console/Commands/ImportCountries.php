@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Imports\CountriesImport;
+use App\Models\City;
 use App\Models\Country;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
@@ -43,8 +44,8 @@ class ImportCountries extends Command
     {
         $rows = Excel::toArray(new CountriesImport(), public_path('countries.xlsx'));
         $countries = [];
-        foreach ($rows[0] as $index => $row){
-            if ($index == 0 || empty($row[3])){
+        foreach ($rows[0] as $index => $row) {
+            if ($index == 0 || empty($row[3])) {
                 continue;
             }
 
@@ -56,8 +57,8 @@ class ImportCountries extends Command
                 'name' => $name,
             ];
         }
-        foreach ($rows[1] as $index => $row){
-            if ($index == 0){
+        foreach ($rows[1] as $index => $row) {
+            if ($index == 0) {
                 continue;
             }
 
@@ -72,9 +73,9 @@ class ImportCountries extends Command
                 'location' => $row[7] ?? null,
             ];
 
-            if (isset($countries[$name])){
-                $countries[$name] = array_merge($countries[$name],$data);
-            }else{
+            if (isset($countries[$name])) {
+                $countries[$name] = array_merge($countries[$name], $data);
+            } else {
                 $data['name'] = $name;
                 $data['lat'] = 0;
                 $data['lon'] = 0;
@@ -83,8 +84,15 @@ class ImportCountries extends Command
 
         }
 
-        foreach ($countries as $country){
-            Country::firstOrCreate($country);
+
+        foreach ($countries as $country) {
+            City::firstOrCreate([
+                'name' => $country['name']
+            ], [
+                'public' => 1,
+                'lat' => $country['lat'],
+                'lon' => $country['lon']
+            ]);
         }
         return 0;
     }

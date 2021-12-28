@@ -71,4 +71,9 @@ class ScoreController extends Controller
 
         return response()->json(round($countUser * 100 / $users->count()));
     }
+
+    public function last()
+    {
+       return Auth::user()->scores()->latest()->first();
+    }
 }
