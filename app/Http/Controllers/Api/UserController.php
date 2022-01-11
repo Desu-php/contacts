@@ -17,4 +17,5 @@ class UserController extends Controller
         Log::info('Пользователь '.Auth::user()->phone.' удалил себя из системы');
         return response()->json(User::destroy(Auth::id()));
     }
+
 }
