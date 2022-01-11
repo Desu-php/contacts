@@ -100,6 +100,7 @@ class PersonController extends Controller
         $person->reminderCall = $request->reminderCall;
         $person->removed = $request->has('removed');
         $person->user_id = Auth::id();
+        $person->me = true;
 
         if ($request->hasFile('thumbnailImage')) {
             $person->thumbnailImage = $this->uploadFile($request->file('thumbnailImage'), 'thumbnailImages');

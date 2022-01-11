@@ -99,7 +99,7 @@ class AuthController extends Controller
 
         $user = User::where('phone', $attempt['phone'])->exists();
 
-        if (!$user){
+        if (!$user) {
             User::create([
                 'phone' => $attempt['phone'],
                 'password' => Hash::make(self::Password)
@@ -184,7 +184,9 @@ class AuthController extends Controller
      */
     public function userProfile()
     {
-        return response()->json(auth()->user()->load('profile'));
+        return response()->json(auth()->user()->load(['profile' => function ($query) {
+            $query->with(['tags', 'cities', 'activities', 'companies']);
+        }]));
     }
 
     /**
