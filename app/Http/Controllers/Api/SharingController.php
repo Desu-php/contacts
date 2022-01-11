@@ -227,7 +227,7 @@ class SharingController extends Controller
         $sharings->map(function ($sharing) {
             $persons = Person::where('user_id', $sharing->user_id)->where('me', 0);
             foreach ($this->sharingWith as $value) {
-                $persons = $this->sharingConditions($sharing, $persons, $value, str_replace('_ids', '', $value));
+                $persons = $this->filterPersons($persons, $sharing);
             }
 
             $sharing->persons_count = $persons->count();

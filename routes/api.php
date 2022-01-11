@@ -86,6 +86,7 @@ Route::group(['namespace' => 'Api','middleware' => ['auth:api'],], function (){
         Route::get('/', 'ScoreController@getScores');
         Route::get('indicator', 'ScoreController@getIndicator');
         Route::get('last', 'ScoreController@last');
+        Route::get('statistics', 'ScoreController@statistics');
     });
 
     Route::group(['prefix' => 'tasks'], function (){

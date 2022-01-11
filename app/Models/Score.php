@@ -14,7 +14,8 @@ class Score extends Model
         'score',
         'percent',
         'user_id',
-        'request_score'
+        'request_score',
+        'created_at'
     ];
 
     public function user()

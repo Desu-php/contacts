@@ -90,15 +90,16 @@ class PersonController extends Controller
         }
 
         $person = Person::where('user_id', Auth::id())
-            ->where('me', 1)
-            ->first();
+            ->where('me', true)
+            ->firstOrNew();
 
         $person->givenName = $request->givenName;
         $person->familyName = $request->familyName;
         $person->middleName = $request->middleName;
-        $person->moreNo = $request->moreNo;
+        $person->moreNo = $request->has('moreNo');
         $person->reminderCall = $request->reminderCall;
-        $person->removed = $request->removed;
+        $person->removed = $request->has('removed');
+        $person->user_id = Auth::id();
 
         if ($request->hasFile('thumbnailImage')) {
             $person->thumbnailImage = $this->uploadFile($request->file('thumbnailImage'), 'thumbnailImages');

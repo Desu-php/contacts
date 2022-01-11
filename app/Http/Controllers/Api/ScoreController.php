@@ -8,6 +8,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ScoreController extends Controller
 {
@@ -24,7 +25,7 @@ class ScoreController extends Controller
 
         $prevScore = auth()->user()
             ->scores()
-            ->whereDate('created_at','<', now()->format('Y-m-d'))
+            ->whereDate('created_at', '<', now()->format('Y-m-d'))
             ->sum('score');
 
         if (!is_null($prevScore)) {
@@ -34,7 +35,7 @@ class ScoreController extends Controller
         auth()->user()
             ->scores()
             ->whereDate('created_at', now()->format('Y-m-d'))
-            ->updateOrCreate([], ['score' => $score]);
+            ->updateOrCreate([], ['score' => $score, 'request_score' => $request->score]);
 
         return response()->json([
             'message' => 'Успешно добавлен'
@@ -74,6 +75,37 @@ class ScoreController extends Controller
 
     public function last()
     {
-       return Auth::user()->scores()->latest()->first();
+        return Auth::user()->scores()->latest()->first();
+    }
+
+    public function statistics(Request $request)
+    {
+        $this->validate($request, [
+            'limit' => 'required|numeric'
+        ]);
+
+        $startMonth = Carbon::now()->addMonths(-($request->limit - 1))->startOfMonth()->toDateString();
+
+        $scores = Score::whereDate('created_at', '>=', $startMonth)
+            ->whereDate('created_at', '<=', now()->toDateString())
+            ->where('user_id', auth()->id())
+            ->select('scores.*', DB::raw("DATE_FORMAT(created_at, '%Y-%m') new_date"))
+            ->orderBy('new_date')
+            ->get()
+            ->groupBy('new_date');
+
+        $results = [];
+        $month = Carbon::parse($startMonth)->format('Y-m');
+        $lastMonth = now()->addMonth()->format('Y-m');
+        while ($month != $lastMonth){
+            if (!empty($scores[$month])){
+                $results[$month] = $scores[$month]->sum('score');
+            }else{
+                $results[$month] = 0;
+            }
+            $month = Carbon::parse($month)->addMonth()->format('Y-m');
+        }
+
+        return response()->json($results);
     }
 }
