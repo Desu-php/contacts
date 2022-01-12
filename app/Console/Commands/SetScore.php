@@ -45,11 +45,11 @@ class SetScore extends Command
         $lastMonth = now()->addMonth()->format('Y-m');
 
         $scores = [
-            ['score' => 433, 'request_score' => 433],
-            ['score' => 1000, 'request_score' => 1433],
-            ['score' => 567, 'request_score' => 2000],
-            ['score' => 50, 'request_score' => 2050],
-            ['score' => 0, 'request_score' => 2050],
+            ['score' => 1, 'request_score' => 1],
+            ['score' => 1, 'request_score' => 2],
+            ['score' => 2, 'request_score' => 4],
+            ['score' => 1, 'request_score' => 5],
+            ['score' => 3, 'request_score' => 8],
         ];
 
         foreach ($users as $user){
