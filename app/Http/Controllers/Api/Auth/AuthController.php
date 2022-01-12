@@ -184,9 +184,7 @@ class AuthController extends Controller
      */
     public function userProfile()
     {
-        return response()->json(auth()->user()->load(['profile' => function ($query) {
-            $query->with(['tags', 'cities', 'activities', 'companies']);
-        }]));
+        return response()->json(auth()->user());
     }
 
     /**

@@ -20,7 +20,17 @@ class User extends Authenticatable
     protected $fillable = [
         'password',
         'phone',
-        'id'
+        'id',
+        'city',
+        'company',
+        'email',
+        'family_name',
+        'given_name',
+        'note',
+        'my_phone',
+        'position',
+        'site',
+        'image'
     ];
 
     /**
@@ -44,6 +54,12 @@ class User extends Authenticatable
         'phone_verified_at' => 'datetime'
     ];
 
+
+    public function getAvatarAttribute()
+    {
+        $image = $this->image;
+        return $image ? asset($image) : null;
+    }
 
     public function findForPassport($username) {
 

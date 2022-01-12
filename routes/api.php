@@ -33,7 +33,7 @@ Route::group([
 Route::group(['namespace' => 'Api','middleware' => ['auth:api'],], function (){
     Route::get('get_list_persons', 'PersonController@get_list_persons');
     Route::post('person/upload', 'PersonController@upload');
-    Route::post('change_user_info', 'PersonController@change_user_info');
+
     Route::get('get_user_info', 'PersonController@get_user_info');
 
     Route::get('get_list_towns', 'CityController@get_list_towns');
@@ -79,6 +79,8 @@ Route::group(['namespace' => 'Api','middleware' => ['auth:api'],], function (){
 
     Route::group(['prefix' => 'user'], function (){
         Route::delete('/', 'UserController@destroy');
+        Route::post('change_user_info', 'UserController@change_user_info');
+        Route::get('me', 'UserController@me');
     });
 
     Route::group(['prefix' => 'scores'], function (){
