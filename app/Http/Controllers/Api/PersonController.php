@@ -34,7 +34,7 @@ class PersonController extends Controller
         $log = LogActivity::where('user_id', Auth::id())
             ->orderBy('id', 'DESC')->first();
 
-        return response()->json(['data' => $persons, 'last_id' => !is_null($log)?$log->id:null]);
+        return response()->json(['data' => $persons, 'last_id' => !is_null($log) ? $log->id : null]);
     }
 
     public function upload(Request $request)
@@ -69,5 +69,12 @@ class PersonController extends Controller
             ])->first();
 
         return response()->json($persons);
+    }
+
+    public function getDismantledPersonsCount()
+    {
+        return response()->json(Person::whereDoesntHave('tags', function ($query){
+            return $query->where('name', 'Неразобранные');
+        })->count());
     }
 }

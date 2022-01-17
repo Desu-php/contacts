@@ -50,9 +50,9 @@ class ScoreController extends Controller
             ->get();
 
         return response()->json([
-            'today' => $scores->first()->score,
-            'week' => $scores->take(7)->sum('score'),
-            'month' => $scores->sum('score')
+            'today' => max($scores->first()->score, 0),
+            'week' => max($scores->take(7)->sum('score'), 0),
+            'month' => max($scores->sum('score'), 0)
         ]);
     }
 
@@ -97,10 +97,10 @@ class ScoreController extends Controller
         $results = [];
         $month = Carbon::parse($startMonth)->format('Y-m');
         $lastMonth = now()->addMonth()->format('Y-m');
-        while ($month != $lastMonth){
-            if (!empty($scores[$month])){
+        while ($month != $lastMonth) {
+            if (!empty($scores[$month])) {
                 $results[$month] = $scores[$month]->sum('score');
-            }else{
+            } else {
                 $results[$month] = 0;
             }
             $month = Carbon::parse($month)->addMonth()->format('Y-m');
