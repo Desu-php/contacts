@@ -73,8 +73,16 @@ class PersonController extends Controller
 
     public function getDismantledPersonsCount()
     {
-        return response()->json(Person::whereDoesntHave('tags', function ($query){
+        return response()->json(Person::whereDoesntHave('tags', function ($query) {
             return $query->where('name', 'Неразобранные');
-        })->count());
+        })
+            ->where('me', false)
+            ->where('user_id', Auth::id())
+            ->count());
+    }
+
+    public function getCount()
+    {
+        return response()->json(Auth::user()->persons()->where('me', false)->count());
     }
 }

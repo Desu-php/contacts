@@ -12,6 +12,9 @@ class Task extends Model
 
     const delivered = 'поставлена';
     const completed = 'выполнена';
+    const not_to_do = 'не делать';
+    const postpone_until_tomorrow = 'отложить на завтра';
+    const delegate_to_assistant = 'перепоручить ассистенту';
 
     protected $perPage = 50;
 

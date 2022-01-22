@@ -34,6 +34,7 @@ Route::group(['namespace' => 'Api','middleware' => ['auth:api'],], function (){
 
     Route::group(['prefix' => 'persons'], function (){
         Route::get('dismantled/count', 'PersonController@getDismantledPersonsCount');
+        Route::get('count', 'PersonController@getCount');
     });
 
     Route::get('get_list_persons', 'PersonController@get_list_persons');

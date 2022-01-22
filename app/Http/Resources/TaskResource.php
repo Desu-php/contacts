@@ -20,6 +20,8 @@ class TaskResource extends JsonResource
            'description' => $this->description,
            'reminder' => $this->reminder,
            'status' => new StatusResource($this->status),
+           'created_at' => $this->created_at,
+           'updated_at' => $this->updated_at
        ];
     }
 }
